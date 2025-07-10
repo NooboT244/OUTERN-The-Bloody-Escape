@@ -5,7 +5,7 @@
 void iDraw()
 {
 	iClear();
-	iFilledRectangle(20, 30, 100, 100);
+	iFilledRectangle(60, 40, 100, 100);
 	iSetColor(255, 255, 255);
 
 }
@@ -21,27 +21,27 @@ void iDraw()
 
 void iMouseMove(int mx, int my)
 {
-	
+
 }
 //*******************************************************************ipassiveMouse***********************************************************************//
 void iPassiveMouseMove(int mx, int my)
 {
-	
+
 }
 
 void iMouse(int button, int state, int mx, int my)
 {
-	
+
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
 
-		
+
 	}
-	
-	
+
+
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
-		
+
 	}
 }
 
@@ -55,10 +55,10 @@ void iKeyboard(unsigned char key)
 {
 	if (key == '\r')
 	{
-		
+
 	}
-	
-	
+
+
 }
 
 /*
@@ -73,21 +73,21 @@ GLUT_KEY_PAGE DOWN, GLUT_KEY_HOME, GLUT_KEY_END, GLUT_KEY_INSERT
 void iSpecialKeyboard(unsigned char key)
 {
 
-	
+
 	if (key == GLUT_KEY_RIGHT)
 	{
-				
+
 	}
 	if (key == GLUT_KEY_LEFT)
 	{
-		
+
 	}
-	
+
 	if (key == GLUT_KEY_HOME)
 	{
-		
+
 	}
-	
+
 }
 
 
