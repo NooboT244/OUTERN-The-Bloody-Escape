@@ -5,7 +5,7 @@
 void iDraw()
 {
 	iClear();
-	iFilledRectangle(20, 20, 100, 100);
+	iFilledRectangle(20, 30, 100, 100);
 	iSetColor(255, 255, 255);
 
 }
