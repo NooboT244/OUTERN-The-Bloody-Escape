@@ -94,7 +94,7 @@ void iSpecialKeyboard(unsigned char key)
 int main()
 {
 	///srand((unsigned)time(NULL));
-	iInitialize(600, 400, "Project Title");
+	iInitialize(1200, 800, "Project Title");
 	///updated see the documentations
 	iStart();
 	return 0;
