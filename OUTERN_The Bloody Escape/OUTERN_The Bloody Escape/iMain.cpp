@@ -1,14 +1,18 @@
+
 #include "iGraphics.h"
 #define DWW 1200
 #define DWH 800
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
-int blinking_Cursour_Color[3] = {0,0,0},color_Increment_Decrement = 5;
+int blinking_Cursour_Color[3] = { 0, 0, 0 }, color_Increment_Decrement = 20,intro_background_texture;
 void iDraw()
 {
-    iClear();
-    iSetColor(blinking_Cursour_Color[0],blinking_Cursour_Color[1],blinking_Cursour_Color[2]);
-    iFilledRectangle(600,400,24,45);
-
+	iClear();
+	iSetColor(0, 0, 0);
+	iShowImage(0, 0, DWW, DWH, intro_background_texture);
+	iSetColor(blinking_Cursour_Color[0], blinking_Cursour_Color[1], blinking_Cursour_Color[2]);
+	iFilledRectangle(600, 400, 24, 45);
+	
+	
 }
 
 
@@ -33,17 +37,17 @@ void iPassiveMouseMove(int mx, int my)
 void iMouse(int button, int state, int mx, int my)
 {
 
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
 
 
-    }
+	}
 
 
-    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
-    {
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
 
-    }
+	}
 }
 
 /*
@@ -54,10 +58,10 @@ key- holds the ASCII value of the key pressed.
 
 void iKeyboard(unsigned char key)
 {
-    if (key == '\r')
-    {
+	if (key == '\r')
+	{
 
-    }
+	}
 
 
 }
@@ -75,40 +79,42 @@ void iSpecialKeyboard(unsigned char key)
 {
 
 
-    if (key == GLUT_KEY_RIGHT)
-    {
+	if (key == GLUT_KEY_RIGHT)
+	{
 
-    }
-    if (key == GLUT_KEY_LEFT)
-    {
+	}
+	if (key == GLUT_KEY_LEFT)
+	{
 
-    }
+	}
 
-    if (key == GLUT_KEY_HOME)
-    {
+	if (key == GLUT_KEY_HOME)
+	{
 
-    }
+	}
 
 }
 
 void blinking_Cursour()
 {
 
-    for(int &color : blinking_Cursour_Color)
-    {
-        color += color_Increment_Decrement;
-    }
+	for (int &color : blinking_Cursour_Color)
+	{
+		color += color_Increment_Decrement;
+	}
 
-    if(blinking_Cursour_Color[2] >= 240 || blinking_Cursour_Color[2] <= 0)
-    {
-        color_Increment_Decrement *= -1;
-    }
+	if (blinking_Cursour_Color[2] >= 240 || blinking_Cursour_Color[2] <= 0)
+	{
+		color_Increment_Decrement *= -1;
+	}
 }
 int main()
 {
-    ///srand((unsigned)time(NULL));
-    iInitialize(DWW, DWH, "OUTERN : The Bloody Escape");
-    iSetTimer(1,blinking_Cursour);
-    iStart();
-    return 0;
+	///srand((unsigned)time(NULL));
+	
+	iInitialize(DWW, DWH, "OUTERN : The Bloody Escape");
+	intro_background_texture = iLoadImage("OUTERN1.png");
+	iSetTimer(16, blinking_Cursour);
+	iStart();
+	return 0;
 }
