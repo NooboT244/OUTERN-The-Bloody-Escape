@@ -1,16 +1,19 @@
 
 #include "iGraphics.h"
-#define DWW 1200
-#define DWH 800
+#define Default_window_width 1520
+#define Default_window_height 855
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 int blinking_Cursour_Color[3] = { 0, 0, 0 }, color_Increment_Decrement = 20,intro_background_texture;
+double text_blackmask_X = 165;
 void iDraw()
 {
 	iClear();
 	iSetColor(0, 0, 0);
-	iShowImage(0, 0, DWW, DWH, intro_background_texture);
+	iShowImage(0, 0, Default_window_width, Default_window_height, intro_background_texture);
+	iSetColor(0, 0, 0);
+	iFilledRectangle(text_blackmask_X, Default_window_height / 2.25, 1920 - text_blackmask_X, 120);
 	iSetColor(blinking_Cursour_Color[0], blinking_Cursour_Color[1], blinking_Cursour_Color[2]);
-	iFilledRectangle(600, 400, 24, 45);
+	iFilledRectangle(text_blackmask_X - 100, Default_window_height / 2.25, 100, 120);
 	
 	
 }
@@ -108,13 +111,20 @@ void blinking_Cursour()
 		color_Increment_Decrement *= -1;
 	}
 }
+
+void black_Mask_Animation()
+{
+	text_blackmask_X += 96;
+}
 int main()
 {
 	///srand((unsigned)time(NULL));
 	
-	iInitialize(DWW, DWH, "OUTERN : The Bloody Escape");
+	iInitialize(Default_window_width, Default_window_height, "OUTERN : The Bloody Escape");
 	intro_background_texture = iLoadImage("OUTERN1.png");
 	iSetTimer(16, blinking_Cursour);
+	iSetTimer(300, black_Mask_Animation);
+
 	iStart();
 	return 0;
 }
