@@ -1,7 +1,7 @@
 #include "OUTERN.h"
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 int blinking_Cursour_Color[3] = { 0, 0, 0 }, color_Increment_Decrement = 20,intro_background_texture[3],blackmask_Move_Animation;
-int blinking_Cursour_Show = 0,Stage = 0;
+int blinking_Cursour_Show = 0,Page = 0;
 int Menu_background_texture[22],Menu_background_texture_index = 0,Menu_Button[5],Menu_Button_Dark[5];
 int Menu_Buttons[10];
 int Play_Index = 0,Credits_Index = 2,Help_Index = 4,Sound_Index = 6,Exit_Index = 8;
@@ -11,7 +11,7 @@ void iDraw()
     iClear();
     //iDelayMS(16.67);
     //Intro_Start
-    if(!Stage)
+    if(!Page)
     {
         iSetColor(0, 0, 0);
         /*if(text_blackmask_X >= 1420)
@@ -33,7 +33,7 @@ void iDraw()
             iFilledRectangle(text_blackmask_X,Default_window_height / 2.3, 20, 105);
         }
 
-        if(text_blackmask_X >= 1420 and !blinking_Cursour_Show)
+        if(text_blackmask_X >= 1420 && !blinking_Cursour_Show)
         {
             blinking_Cursour_Show = 1;
         }
@@ -46,12 +46,10 @@ void iDraw()
         if(text_blackmask_X >= 1700)
         {
             iPauseTimer(blackmask_Move_Animation);
-            Stage++;
+            Page++;
         }
-
-
     }
-    else if(Stage == 1)
+    else if(Page == 1)
     {
         iShowImage(0, 0, Default_window_width, Default_window_height, Menu_background_texture[Menu_background_texture_index]);
         iShowImage(1100, 400, 200,67,Menu_Buttons[Play_Index]);
@@ -84,25 +82,25 @@ void iMouseMove(int mx, int my)
 //*******************************************************************ipassiveMouse***********************************************************************//
 void iPassiveMouseMove(int mx, int my)
 {
-    if(mx >= 1100 and mx <= 1300)
+    if(mx >= 1100 && mx <= 1300)
     {
-        if(my <= 467 and my >= 400)
+        if(my <= 467 && my >= 400)
         {
             Play_Index = 1;
         }
-        else if(my <= 387 and my >= 320)
+        else if(my <= 387 && my >= 320)
         {
             Credits_Index = 3;
         }
-        else if(my <= 307 and my >= 240)
+        else if(my <= 307 && my >= 240)
         {
             Help_Index = 5;
         }
-        else if(my <= 227 and my >= 160)
+        else if(my <= 227 && my >= 160)
         {
             Sound_Index = 7;
         }
-        else if(my <= 147 and my >= 80)
+        else if(my <= 147 && my >= 80)
         {
             Exit_Index = 9;
         }
@@ -128,16 +126,28 @@ void iPassiveMouseMove(int mx, int my)
 
 void iMouse(int button, int state, int mx, int my)
 {
-
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    if(mx >= 1100 && mx <= 1300)
     {
+        if(my <= 467 && my >= 400 && button == GLUT_LEFT_BUTTON)
+        {
+            Page++;
+        }
+        else if(my <= 387 && my >= 320 && button == GLUT_LEFT_BUTTON)
+        {
 
+        }
+        else if(my <= 307 && my >= 240 && button == GLUT_LEFT_BUTTON)
+        {
 
-    }
+        }
+        else if(my <= 227 && my >= 160 && button == GLUT_LEFT_BUTTON)
+        {
 
-
-    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
-    {
+        }
+        else if(my <= 147 && my >= 80 && button == GLUT_LEFT_BUTTON)
+        {
+            exit(0);
+        }
 
     }
 }
@@ -256,7 +266,7 @@ int main()
     Load_Menu_Buttons();
     iSetTimer(16, blinking_Cursour);
     blackmask_Move_Animation = iSetTimer(16, black_Mask_Animation);
-    iSetTimer(210, Menu_background_texture_Animation);
+    iSetTimer(250, Menu_background_texture_Animation);
     iStart();
     return 0;
 }
