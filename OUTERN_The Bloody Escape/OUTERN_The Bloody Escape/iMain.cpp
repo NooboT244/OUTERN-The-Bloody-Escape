@@ -1,11 +1,16 @@
 #include "OUTERN.h"
+using namespace std;
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 int blinking_Cursour_Color[3] = { 0, 0, 0 }, color_Increment_Decrement = 20,intro_background_texture[3],blackmask_Move_Animation;
 int blinking_Cursour_Show = 0,Page = 0;
 int Menu_background_texture[22],Menu_background_texture_index = 0,Menu_Button[5],Menu_Button_Dark[5];
 int Menu_Buttons[10];
+int Waiting_Page_Textures[4],Tap_To_Continue_Index = 2;
 int Play_Index = 0,Credits_Index = 2,Help_Index = 4,Sound_Index = 6,Exit_Index = 8;
+int menu_Texture_Load_index = 0;
+int Menu_Textures_Load;
 double text_blackmask_X = 102;
+void Load_Menu_Textures();
 void iDraw()
 {
     iClear();
@@ -46,10 +51,28 @@ void iDraw()
         if(text_blackmask_X >= 1700)
         {
             iPauseTimer(blackmask_Move_Animation);
-            Page++;
+            Page = 1;
+            Menu_Textures_Load = iSetTimer(200,Load_Menu_Textures);
         }
     }
     else if(Page == 1)
+    {
+        iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[0]);
+        iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[1]);
+        if(menu_Texture_Load_index <= 24)
+        {
+            iSetColor(255,255,255);
+            iRectangle(200,100,1120,30);
+            iFilledRectangle(205,105,(((menu_Texture_Load_index < 22)? menu_Texture_Load_index:21)*1110)/21,20);
+        }
+        else
+        {
+            iPauseTimer(Menu_Textures_Load);
+            iShowImage((Default_window_width/2) - 150,300,300,101, Waiting_Page_Textures[Tap_To_Continue_Index]);
+        }
+
+    }
+    else if(Page == 2)
     {
         iShowImage(0, 0, Default_window_width, Default_window_height, Menu_background_texture[Menu_background_texture_index]);
         iShowImage(1100, 400, 200,67,Menu_Buttons[Play_Index]);
@@ -82,26 +105,56 @@ void iMouseMove(int mx, int my)
 //*******************************************************************ipassiveMouse***********************************************************************//
 void iPassiveMouseMove(int mx, int my)
 {
-    if(mx >= 1100 && mx <= 1300)
+    if(Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu_Texture_Load_index > 24)
+    {
+        Tap_To_Continue_Index = 3;
+    }
+    else
+    {
+        Tap_To_Continue_Index = 2;
+    }
+
+
+    if(mx >= 1100 && mx <= 1300 && Page == 2)
     {
         if(my <= 467 && my >= 400)
         {
             Play_Index = 1;
+            Credits_Index = 2;
+            Help_Index = 4;
+            Sound_Index = 6;
+            Exit_Index = 8;
         }
         else if(my <= 387 && my >= 320)
         {
+            Play_Index = 0;
             Credits_Index = 3;
+            Help_Index = 4;
+            Sound_Index = 6;
+            Exit_Index = 8;
         }
         else if(my <= 307 && my >= 240)
         {
+            Play_Index = 0;
+            Credits_Index = 2;
             Help_Index = 5;
+            Sound_Index = 6;
+            Exit_Index = 8;
         }
         else if(my <= 227 && my >= 160)
         {
+            Play_Index = 0;
+            Credits_Index = 2;
+            Help_Index = 4;
             Sound_Index = 7;
+            Exit_Index = 8;
         }
         else if(my <= 147 && my >= 80)
         {
+            Play_Index = 0;
+            Credits_Index = 2;
+            Help_Index = 4;
+            Sound_Index = 6;
             Exit_Index = 9;
         }
         else
@@ -126,11 +179,22 @@ void iPassiveMouseMove(int mx, int my)
 
 void iMouse(int button, int state, int mx, int my)
 {
-    if(mx >= 1100 && mx <= 1300)
+
+    if(Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu_Texture_Load_index > 24)
+    {
+        if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            Page = 2;
+            Tap_To_Continue_Index = 2;
+        }
+    }
+
+
+    if(mx >= 1100 && mx <= 1300 && Page == 2)
     {
         if(my <= 467 && my >= 400 && button == GLUT_LEFT_BUTTON)
         {
-            Page++;
+            Page = 3;
         }
         else if(my <= 387 && my >= 320 && button == GLUT_LEFT_BUTTON)
         {
@@ -225,12 +289,14 @@ void Load_Intro_Textures()
 
 void Load_Menu_Textures()
 {
-    for(int i = 1; i <= 22; i++)
+    if(menu_Texture_Load_index < 22)
     {
         char textures_name[45];
-        sprintf_s(textures_name,"game_texture\\menu_anim_tex\\menu_bg_%d.png",i);
-        Menu_background_texture[i - 1] = iLoadImage(textures_name);
+        sprintf_s(textures_name,"game_texture\\menu_anim_tex\\menu_bg_%d.png",menu_Texture_Load_index + 1);
+        Menu_background_texture[menu_Texture_Load_index] = iLoadImage(textures_name);
     }
+    menu_Texture_Load_index++;
+
 }
 void Load_Menu_Buttons()
 {
@@ -243,6 +309,14 @@ void Load_Menu_Buttons()
 
 }
 
+void Load_waiting_page_texture()
+{
+    Waiting_Page_Textures[0] = iLoadImage("game_texture\\waiting_page_tex\\Waiting_Page_bg.png");
+    Waiting_Page_Textures[1] = iLoadImage("game_texture\\waiting_page_tex\\Waiting_Page_Title.png");
+    Waiting_Page_Textures[2] = iLoadImage("game_texture\\waiting_page_tex\\CLICK_TO_CONTINUE_min.png");
+    Waiting_Page_Textures[3] = iLoadImage("game_texture\\waiting_page_tex\\CLICK_TO_CONTINUE_large.png");
+}
+
 void Menu_background_texture_Animation()
 {
     if(Menu_background_texture_index < 21)
@@ -253,7 +327,6 @@ void Menu_background_texture_Animation()
     {
         Menu_background_texture_index = 0;
     }
-
 }
 
 int main()
@@ -262,7 +335,8 @@ int main()
 
     iInitialize(Default_window_width, Default_window_height, "OUTERN : The Bloody Escape");
     Load_Intro_Textures();
-    Load_Menu_Textures();
+    Load_waiting_page_texture();
+
     Load_Menu_Buttons();
     iSetTimer(16, blinking_Cursour);
     blackmask_Move_Animation = iSetTimer(16, black_Mask_Animation);
