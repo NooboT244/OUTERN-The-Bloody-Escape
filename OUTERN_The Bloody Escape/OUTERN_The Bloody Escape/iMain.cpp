@@ -52,7 +52,7 @@ void iDraw()
         {
             iPauseTimer(blackmask_Move_Animation);
             Page = 1;
-            Menu_Textures_Load = iSetTimer(200,Load_Menu_Textures);
+            Menu_Textures_Load = iSetTimer(450,Load_Menu_Textures);
         }
     }
     else if(Page == 1)
