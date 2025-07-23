@@ -16,19 +16,20 @@ int Waiting_Page_Textures[4],Tap_To_Continue_Index = 2;
 int Play_Index = 0,Credits_Index = 2,Help_Index = 4,Sound_Index = 6,Exit_Index = 8;
 int menu_Texture_Load_index = 0;
 int Menu_Textures_Load;
+int SOUND_ICON_Texture[2],SOUND_ICON_Index = 0;
 double text_blackmask_X = 102;
 int Loading_Icon_Textures[25],Loading_icon_index = 0,Loding_Animation;
 
 
 void Load_Texture_Animation();
 void Load_Menu_Textures();
+void Loading_Sound_Texture();
 
 void iDraw()
 {
     iClear();
-    //iDelayMS(16.67);
-    //Intro_Start
-    if(!Page)
+
+    if(!Page)                                                                                                                     //Intro_Page
     {
         iSetColor(0, 0, 0);
         /*if(text_blackmask_X >= 1420)
@@ -64,43 +65,52 @@ void iDraw()
         {
             iPauseTimer(blackmask_Move_Animation);
             Page = 1;
+            Loading_Sound_Texture();
 			Menu_Textures_Load = iSetTimer(700, Load_Menu_Textures);
 			iResumeTimer(Loding_Animation);
-			
+
         }
     }
-    else if(Page == 1)
+    else if(Page == 1)                                                                                                 //Waiting_Page
     {
         iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[0]);
         iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[1]);
         if(menu_Texture_Load_index <= 24)
         {
-			
+
             iSetColor(255,255,255);
             iRectangle(200,100,1120,30);
             iFilledRectangle(205,105,(((menu_Texture_Load_index < 22)? menu_Texture_Load_index:21)*1110)/21,20);
 			iShowImage((Default_window_width / 2) - 190, 150, Default_window_width / 4, Default_window_height / 4, Loading_Icon_Textures[Loading_icon_index]);
-			
+
         }
         else
         {
-			
+
             iPauseTimer(Menu_Textures_Load);
 			iPauseTimer(Loding_Animation);
             iShowImage((Default_window_width/2) - 150,300,300,101, Waiting_Page_Textures[Tap_To_Continue_Index]);
         }
 
     }
-    else if(Page == 2)
+    else if(Page == 2)                                                                                                   //Menu_Page
     {
         iShowImage(0, 0, Default_window_width, Default_window_height, Menu_background_texture[Menu_background_texture_index]);
         iShowImage(1100, 400, 200,67,Menu_Buttons[Play_Index]);
         iShowImage(1100, 320, 200,67,Menu_Buttons[Credits_Index]);
         iShowImage(1100, 240, 200,67,Menu_Buttons[Help_Index]);
         iShowImage(1100, 160, 200,67,Menu_Buttons[Sound_Index]);
+        iShowImage(1320, 170, 60,60,SOUND_ICON_Texture[SOUND_ICON_Index]);
         iShowImage(1100, 80, 200,67,Menu_Buttons[Exit_Index]);
-
-
+    }else if(Page == 3)
+    {
+         iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[0]);
+    }else if(Page == 4)
+    {
+         iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[0]);
+    }else if(Page == 5)
+    {
+         iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[0]);
     }
 
 
@@ -217,15 +227,15 @@ void iMouse(int button, int state, int mx, int my)
         }
         else if(my <= 387 && my >= 320 && button == GLUT_LEFT_BUTTON)
         {
-
+             Page = 4;
         }
         else if(my <= 307 && my >= 240 && button == GLUT_LEFT_BUTTON)
         {
-
+             Page = 5;
         }
-        else if(my <= 227 && my >= 160 && button == GLUT_LEFT_BUTTON)
+        else if(my <= 227 && my >= 160 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-
+            SOUND_ICON_Index = (SOUND_ICON_Index == 0)? 1:0;
         }
         else if(my <= 147 && my >= 80 && button == GLUT_LEFT_BUTTON)
         {
@@ -366,6 +376,11 @@ void Load_Texture_Animation()
 	    Loading_icon_index++;
     }
 }
+void Loading_Sound_Texture()
+{
+    SOUND_ICON_Texture[0] = iLoadImage("game_texture\\SOUND_ICON\\SOUND_ON.png");
+    SOUND_ICON_Texture[1] = iLoadImage("game_texture\\SOUND_ICON\\SOUND_OFF.png");
+}
 
 int main()
 {
@@ -379,7 +394,7 @@ int main()
     iSetTimer(16, blinking_Cursour);
 	Loding_Animation = iSetTimer(30, Load_Texture_Animation);
 	iPauseTimer(Loding_Animation);
-	
+
     blackmask_Move_Animation = iSetTimer(16, black_Mask_Animation);
     iSetTimer(250, Menu_background_texture_Animation);
     iStart();
