@@ -1,4 +1,11 @@
-#include "OUTERN.h"
+#include "iGraphics.h"
+#include <iostream>
+#include <ctime>
+#include <thread>
+#define Default_window_width 1520
+#define Default_window_height 855
+
+
 using namespace std;
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 int blinking_Cursour_Color[3] = { 0, 0, 0 }, color_Increment_Decrement = 20,intro_background_texture[3],blackmask_Move_Animation;
@@ -10,7 +17,12 @@ int Play_Index = 0,Credits_Index = 2,Help_Index = 4,Sound_Index = 6,Exit_Index =
 int menu_Texture_Load_index = 0;
 int Menu_Textures_Load;
 double text_blackmask_X = 102;
+int Loading_Icon_Textures[25],Loading_icon_index = 0,Loding_Animation;
+
+
+void Load_Texture_Animation();
 void Load_Menu_Textures();
+
 void iDraw()
 {
     iClear();
@@ -52,7 +64,9 @@ void iDraw()
         {
             iPauseTimer(blackmask_Move_Animation);
             Page = 1;
-            Menu_Textures_Load = iSetTimer(450,Load_Menu_Textures);
+			Menu_Textures_Load = iSetTimer(700, Load_Menu_Textures);
+			iResumeTimer(Loding_Animation);
+			
         }
     }
     else if(Page == 1)
@@ -61,13 +75,18 @@ void iDraw()
         iShowImage(0, 0, Default_window_width, Default_window_height, Waiting_Page_Textures[1]);
         if(menu_Texture_Load_index <= 24)
         {
+			
             iSetColor(255,255,255);
             iRectangle(200,100,1120,30);
             iFilledRectangle(205,105,(((menu_Texture_Load_index < 22)? menu_Texture_Load_index:21)*1110)/21,20);
+			iShowImage((Default_window_width / 2) - 190, 150, Default_window_width / 4, Default_window_height / 4, Loading_Icon_Textures[Loading_icon_index]);
+			
         }
         else
         {
+			
             iPauseTimer(Menu_Textures_Load);
+			iPauseTimer(Loding_Animation);
             iShowImage((Default_window_width/2) - 150,300,300,101, Waiting_Page_Textures[Tap_To_Continue_Index]);
         }
 
@@ -302,9 +321,9 @@ void Load_Menu_Buttons()
 {
     for(int i = 1; i < 11; i++)
     {
-        char textures_name[50];
-        sprintf_s(textures_name,"game_texture\\ui_button\\menu_button_%d.png",i);
-        Menu_Buttons[i - 1] = iLoadImage(textures_name);
+        char textures_path_name[50];
+        sprintf_s(textures_path_name,"game_texture\\ui_button\\menu_button_%d.png",i);
+        Menu_Buttons[i - 1] = iLoadImage(textures_path_name);
     }
 
 }
@@ -315,6 +334,15 @@ void Load_waiting_page_texture()
     Waiting_Page_Textures[1] = iLoadImage("game_texture\\waiting_page_tex\\Waiting_Page_Title.png");
     Waiting_Page_Textures[2] = iLoadImage("game_texture\\waiting_page_tex\\CLICK_TO_CONTINUE_min.png");
     Waiting_Page_Textures[3] = iLoadImage("game_texture\\waiting_page_tex\\CLICK_TO_CONTINUE_large.png");
+}
+void Load_Loading_Icon_Textures()
+{
+	for (int i = 1; i <= 25; i++)
+	{
+		char textures_path_name[70];
+		sprintf_s(textures_path_name, "game_texture\\Loading_Icon_Texture\\Loading_Icon%d.png", i);
+		Loading_Icon_Textures[i - 1] = iLoadImage(textures_path_name);
+	}
 }
 
 void Menu_background_texture_Animation()
@@ -328,6 +356,16 @@ void Menu_background_texture_Animation()
         Menu_background_texture_index = 0;
     }
 }
+void Load_Texture_Animation()
+{
+	if (Loading_icon_index >= 25)
+	{
+		Loading_icon_index = 0;
+	}else
+    {
+	    Loading_icon_index++;
+    }
+}
 
 int main()
 {
@@ -336,9 +374,12 @@ int main()
     iInitialize(Default_window_width, Default_window_height, "OUTERN : The Bloody Escape");
     Load_Intro_Textures();
     Load_waiting_page_texture();
-
+	Load_Loading_Icon_Textures();
     Load_Menu_Buttons();
     iSetTimer(16, blinking_Cursour);
+	Loding_Animation = iSetTimer(30, Load_Texture_Animation);
+	iPauseTimer(Loding_Animation);
+	
     blackmask_Move_Animation = iSetTimer(16, black_Mask_Animation);
     iSetTimer(250, Menu_background_texture_Animation);
     iStart();
