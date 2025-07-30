@@ -11,9 +11,21 @@ using namespace std;
 
 struct Intro
 {
-    int blinking_Cursour_Color[3] = { 0, 0, 0 }, color_Increment_Decrement = 20,blinking_Cursour_Show = 0;
+    int blinking_Cursour_Color[3], color_Increment_Decrement,blinking_Cursour_Show;
     int intro_background_texture[3],blackmask_Move_Animation;
-    double text_blackmask_X = 102;
+    double text_blackmask_X;
+
+    Intro()
+    {
+        blinking_Cursour_Color[0] = 0;
+        blinking_Cursour_Color[1] = 0;
+        blinking_Cursour_Color[2] = 0;
+
+        color_Increment_Decrement = 20;
+        blinking_Cursour_Show = 0;
+
+        text_blackmask_X = 102;
+    }
 
     //..........functions.........//
 
@@ -45,8 +57,14 @@ struct Intro
 
 struct Waiting
 {
-    int Waiting_Page_Textures[4],Tap_To_Continue_Index = 2;
-    int Loading_Icon_Textures[25],Loading_icon_index = 0,Loding_Animation;
+    int Waiting_Page_Textures[4],Tap_To_Continue_Index;
+    int Loading_Icon_Textures[25],Loading_icon_index,Loding_Animation;
+
+    Waiting()
+    {
+        Tap_To_Continue_Index = 2;
+        Loading_icon_index = 0;
+    }
 
     //..........functions.........//
 
@@ -62,15 +80,33 @@ struct Waiting
 
 struct Menu
 {
-    int Menu_background_texture[64],Menu_background_texture_index = 0,Menu_Button[5],Menu_Button_Dark[5];
+    int Menu_background_texture[64],Menu_background_texture_index,Menu_Button[5],Menu_Button_Dark[5];
     int Menu_Buttons[10];
-    int menu_Texture_Load_index = 0;
+    int menu_Texture_Load_index;
     int Menu_Textures_Load,Menu_Title;
-    int Play_Index = 0,Credits_Index = 2,Help_Index = 4,Sound_Index = 6,Exit_Index = 8;
-    int SOUND_ICON_Texture[2],SOUND_ICON_Index = 0;
+    int Play_Index,Credits_Index,Help_Index,Sound_Index,Exit_Index;
+    int SOUND_ICON_Texture[2],SOUND_ICON_Index;
+
+    Menu()
+    {
+        Menu_background_texture_index = 0;
+        menu_Texture_Load_index = 0;
+
+        Play_Index = 0;
+        Credits_Index = 2;
+        Help_Index = 4;
+        Sound_Index = 6;
+        Exit_Index = 8;
+
+        SOUND_ICON_Index = 0;
+    }
 
     //..........functions.........//
-
+    void Load_Menu_Sounds()
+    {
+        mciSendString("open \"resources\\sounds\\hover_effect.mp3\" alias Hover_Sound", NULL, 0, NULL);
+        mciSendString("open \"resources\\sounds\\select_effect.mp3\" alias Select_Sound", NULL, 0, NULL);
+    }
     void Load_Menu_Textures()
     {
         if(menu_Texture_Load_index < 64)
@@ -116,10 +152,21 @@ struct Menu
 struct Hero
 {
     int hero_standing_left[6],hero_standing_right[6],hero_walking_left[18],hero_walking_right[18];                                //hero_textures
-    int hero_texture_load_index = 0,hero_standing_index = 0,hero_walking_index = 0;                                               //hero_index
+    int hero_texture_load_index,hero_standing_index,hero_walking_index;                                                           //hero_index
     int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
-    int Hero_Direction = 0;                                                                                                       //left_right_Direction
-    double hero_Position_X = 20;                                                                                                  //hero_position
+    int Hero_Direction;                                                                                                       //left_right_Direction
+    double hero_Position_X,hero_Position_Y,yIncreaseDecrease;                                                      //hero_position
+
+    Hero()
+    {
+        hero_texture_load_index = 0;
+        hero_standing_index = 0;
+        hero_walking_index = 0;
+        Hero_Direction = 0;
+        hero_Position_X = 20;
+        hero_Position_Y = 210;
+        yIncreaseDecrease = 16;
+    }
 
     //..........functions.........//
 
@@ -158,14 +205,28 @@ struct Hero
 
 struct Games
 {
-    int Page = 0;
+    int Page;
     int Back_Button;
     double Level_Select_X[3],Level_Select_Y[3], Level_Select_Width[3],Level_Select_Height[3];
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
-    int Level = 0;
+    int Level;
     int bg_image_1;
-    bool  press = false;
-    double Back_button_X = 20,Back_button_Y = 785,Back_button_Height = 50,Back_button_Width = 50;
+    bool  A_D_press,jump_press;
+    double Back_button_X,Back_button_Y,Back_button_Height,Back_button_Width;
+
+    Games()
+    {
+        Page = 0;
+        Level = 0;
+
+        A_D_press = false;
+        jump_press = false;
+
+        Back_button_X = 20;
+        Back_button_Y = 785;
+        Back_button_Height = 50;
+        Back_button_Width = 50;
+    }
 
     //..........functions.........//
 
@@ -306,6 +367,8 @@ void iDraw()
 
         if(intro.text_blackmask_X >= 1420)
         {
+
+            mciSendString("play Intro_Sound", NULL, 0, NULL);
             iShowImage(0, 0, Default_window_width, Default_window_height, intro.intro_background_texture[1]);
         }
 
@@ -314,8 +377,8 @@ void iDraw()
             iPauseTimer(intro.blackmask_Move_Animation);
             games.Page = 1;
             Loading_Sound_Texture();
-
-            menu.Menu_Textures_Load = iSetTimer(500, Load_Menu_Textures);
+            menu.Load_Menu_Sounds();
+            menu.Menu_Textures_Load = iSetTimer(300, Load_Menu_Textures);
             mciSendString("play bgsong repeat", NULL, 0, NULL);
         }
     }
@@ -384,14 +447,22 @@ void iDraw()
                 iDelayMS(55);
                 if(!hero.Hero_Direction)
                 {
-                    if(!games.press)
+                    if(games.jump_press)
                     {
-                        //iPauseTimer(Hero_Animation_walking);
-                        iShowImage(hero.hero_Position_X,210,Default_window_width/8,Default_window_height/2, hero.hero_standing_right[hero.hero_standing_index]);
+                        hero.hero_Position_Y += hero.yIncreaseDecrease;
+                        if(hero.hero_Position_Y >= 350)
+                        {
+                            hero.yIncreaseDecrease *= -1;
+                        }
+                        if(hero.hero_Position_Y <= 210)
+                        {
+                            hero.yIncreaseDecrease *= -1;
+                            games.jump_press = false;
+                        }
                     }
-                    else
+
+                    if(games.A_D_press)
                     {
-                        iShowImage(hero.hero_Position_X,210,Default_window_width/7,Default_window_height/2, hero.hero_walking_right[hero.hero_walking_index]);
                         if(hero.hero_Position_X <= 1320)
                         {
                             hero.hero_Position_X += 20;
@@ -404,24 +475,40 @@ void iDraw()
                         else
                         {
                             hero.hero_walking_index = 0;
-
                         }
                     }
 
-
-
-                }
-                else
-                {
-                    if(!games.press)
+                    if((games.jump_press && games.A_D_press) || games.jump_press )
                     {
-
-                        //iPauseTimer(Hero_Animation_walking);
-                        iShowImage(hero.hero_Position_X,210,Default_window_width/8,Default_window_height/2, hero.hero_standing_left[hero.hero_standing_index]);
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8,Default_window_height/2, hero.hero_standing_right[hero.hero_standing_index]);
+                    }
+                    else if(games.A_D_press)
+                    {
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2, hero.hero_walking_right[hero.hero_walking_index]);
                     }
                     else
                     {
-                        iShowImage(hero.hero_Position_X,210,Default_window_width/7,Default_window_height/2, hero.hero_walking_left[hero.hero_walking_index]);
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8,Default_window_height/2, hero.hero_standing_right[hero.hero_standing_index]);
+                    }
+                }
+                else
+                {
+                    if(games.jump_press)
+                    {
+                        hero.hero_Position_Y += hero.yIncreaseDecrease;
+                        if(hero.hero_Position_Y >= 350)
+                        {
+                            hero.yIncreaseDecrease *= -1;
+                        }
+                        if(hero.hero_Position_Y <= 210)
+                        {
+                            hero.yIncreaseDecrease *= -1;
+                            games.jump_press = false;
+                        }
+                    }
+
+                    if(games.A_D_press)
+                    {
                         if(hero.hero_Position_X >= 0)
                         {
                             hero.hero_Position_X -= 20;
@@ -434,11 +521,22 @@ void iDraw()
                         else
                         {
                             hero.hero_walking_index = 0;
-
                         }
-
                     }
 
+
+                    if((games.jump_press && games.A_D_press) || games.jump_press )
+                    {
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8,Default_window_height/2, hero.hero_standing_left[hero.hero_standing_index]);
+                    }
+                    else if(games.A_D_press)
+                    {
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2, hero.hero_walking_left[hero.hero_walking_index]);
+                    }
+                    else
+                    {
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8,Default_window_height/2, hero.hero_standing_left[hero.hero_standing_index]);
+                    }
                 }
             }
         }
@@ -484,6 +582,7 @@ void iPassiveMouseMove(int mx, int my)
     //For_Page 1
     if(games.Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu.menu_Texture_Load_index > 24)
     {
+        mciSendString("play Hover_Sound", NULL, 0, NULL);
         waiting.Tap_To_Continue_Index = 3;
     }
     else
@@ -496,6 +595,7 @@ void iPassiveMouseMove(int mx, int my)
     {
         if(my <= 467 && my >= 400)
         {
+            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 1;
             menu.Credits_Index = 2;
             menu.Help_Index = 4;
@@ -504,6 +604,7 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 387 && my >= 320)
         {
+            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 3;
             menu.Help_Index = 4;
@@ -512,6 +613,7 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 307 && my >= 240)
         {
+            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 2;
             menu.Help_Index = 5;
@@ -520,6 +622,7 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 227 && my >= 160)
         {
+            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 2;
             menu.Help_Index = 4;
@@ -528,6 +631,7 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 147 && my >= 80)
         {
+            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 2;
             menu.Help_Index = 4;
@@ -563,10 +667,10 @@ void iPassiveMouseMove(int mx, int my)
     }
     else
     {
-       games.Back_button_X = 20;
-       games.Back_button_Y = 785;
-       games.Back_button_Height = 50;
-       games.Back_button_Width = 50;
+        games.Back_button_X = 20;
+        games.Back_button_Y = 785;
+        games.Back_button_Height = 50;
+        games.Back_button_Width = 50;
     }
 
     //For_page 3
@@ -667,6 +771,7 @@ void iMouse(int button, int state, int mx, int my)
     {
         if(my <= 467 && my >= 400 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound", NULL, 0, NULL);
             games.Page = 3;
             iResumeTimer(games.Level_1_Icons_Animation_ID);
             Level_Icon_Size_Setter();
@@ -674,14 +779,17 @@ void iMouse(int button, int state, int mx, int my)
         }
         else if(my <= 387 && my >= 320 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound", NULL, 0, NULL);
             games.Page = 4;
         }
         else if(my <= 307 && my >= 240 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound", NULL, 0, NULL);
             games.Page = 5;
         }
         else if(my <= 227 && my >= 160 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound", NULL, 0, NULL);
             if(menu.SOUND_ICON_Index == 0)
             {
                 menu.SOUND_ICON_Index = 1;
@@ -695,6 +803,7 @@ void iMouse(int button, int state, int mx, int my)
         }
         else if(my <= 147 && my >= 80 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound", NULL, 0, NULL);
             exit(0);
         }
 
@@ -705,7 +814,7 @@ void iMouse(int button, int state, int mx, int my)
     {
         if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-             games.Page = 2;
+            games.Page = 2;
         }
     }
 
@@ -741,26 +850,32 @@ void iKeyboard(unsigned char key)
     if (key == 'D' || key == 'd')
     {
         hero.Hero_Direction = 0;
-        games.press = true;
+        games.A_D_press = true;
     }
     if (key == 'A' || key == 'a')
     {
         hero.Hero_Direction = 1;
-        games.press = true;
+        games.A_D_press = true;
+    }
+    if(key == ' ')
+    {
+        games.jump_press = true;
+    }
+
+    if(key == 27 && games.Page == 3 && games.Level > 0)
+    {
+        games.Level = 0;
     }
 
 }
 void iKeyboardUp(unsigned char key,int x,int y)
 {
-    if (key == 'A' ||key == 'a')
+    //games.jump_press = false;
+    if (key == 'D' || key == 'd'||key == 'A' || key == 'a')
     {
-        games.press = false;
+        games.A_D_press = false;
+        hero.hero_walking_index = 0;
     }
-    if (key == 'D' ||key == 'd')
-    {
-        games.press = false;
-    }
-    hero.hero_walking_index = 0;
 }
 /*
 function iSpecialKeyboard() is called whenver user hits special keys like-
@@ -803,6 +918,7 @@ int main()
 
     Load_Menu_Buttons();
     mciSendString("open \"resources\\musics\\Main_bg_sound.mp3\" alias bgsong", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Intro.mp3\" alias Intro_Sound", NULL, 0, NULL);
     games.Back_Button = iLoadImage("resources\\game_texture\\ui_buttons\\Back.png");
     menu.Menu_Title = iLoadImage("resources\\game_texture\\menu_textures\\title.png");
     iSetTimer(16, blinking_Cursour);
