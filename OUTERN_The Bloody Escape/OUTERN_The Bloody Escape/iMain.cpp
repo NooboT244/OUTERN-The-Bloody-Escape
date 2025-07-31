@@ -102,11 +102,6 @@ struct Menu
     }
 
     //..........functions.........//
-    void Load_Menu_Sounds()
-    {
-        mciSendString("open \"resources\\sounds\\hover_effect.mp3\" alias Hover_Sound", NULL, 0, NULL);
-        mciSendString("open \"resources\\sounds\\select_effect.mp3\" alias Select_Sound", NULL, 0, NULL);
-    }
     void Load_Menu_Textures()
     {
         if(menu_Texture_Load_index < 64)
@@ -210,8 +205,8 @@ struct Games
     double Level_Select_X[3],Level_Select_Y[3], Level_Select_Width[3],Level_Select_Height[3];
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
     int Level;
-    int bg_image_1;
-    bool  A_D_press,jump_press;
+    int bg_image_1,exit_text,exit_yes[2],exit_no[2],exit_yes_index = 0,exit_no_index = 0;
+    bool  A_D_press,jump_press,exit_press = false;
     double Back_button_X,Back_button_Y,Back_button_Height,Back_button_Width;
 
     Games()
@@ -377,7 +372,6 @@ void iDraw()
             iPauseTimer(intro.blackmask_Move_Animation);
             games.Page = 1;
             Loading_Sound_Texture();
-            menu.Load_Menu_Sounds();
             menu.Menu_Textures_Load = iSetTimer(300, Load_Menu_Textures);
             mciSendString("play bgsong repeat", NULL, 0, NULL);
         }
@@ -409,6 +403,14 @@ void iDraw()
         iShowImage(1100, 160, 200,67,menu.Menu_Buttons[menu.Sound_Index]);
         iShowImage(1320, 170, 60,60,menu.SOUND_ICON_Texture[menu.SOUND_ICON_Index]);
         iShowImage(1100, 80, 200,67,menu.Menu_Buttons[menu.Exit_Index]);
+
+        if(games.exit_press)
+        {
+            iShowImage(360,213.75,800,427.5, waiting.Waiting_Page_Textures[0]);
+            iShowImage(360,213.75,800,427.5, games.exit_text);
+            iShowImage(410,250,200,67,games.exit_yes[games.exit_yes_index]);
+            iShowImage(910,250,200,67,games.exit_no[games.exit_no_index]);
+        }
     }
     else if(games.Page == 3)
     {
@@ -582,7 +584,6 @@ void iPassiveMouseMove(int mx, int my)
     //For_Page 1
     if(games.Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu.menu_Texture_Load_index > 24)
     {
-        mciSendString("play Hover_Sound", NULL, 0, NULL);
         waiting.Tap_To_Continue_Index = 3;
     }
     else
@@ -591,11 +592,10 @@ void iPassiveMouseMove(int mx, int my)
     }
 
     //For_Page 2
-    if(mx >= 1100 && mx <= 1300 && games.Page == 2)
+    if(mx >= 1100 && mx <= 1300 && games.Page == 2 && !games.exit_press)
     {
         if(my <= 467 && my >= 400)
         {
-            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 1;
             menu.Credits_Index = 2;
             menu.Help_Index = 4;
@@ -604,7 +604,6 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 387 && my >= 320)
         {
-            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 3;
             menu.Help_Index = 4;
@@ -613,7 +612,6 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 307 && my >= 240)
         {
-            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 2;
             menu.Help_Index = 5;
@@ -622,7 +620,6 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 227 && my >= 160)
         {
-            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 2;
             menu.Help_Index = 4;
@@ -631,7 +628,6 @@ void iPassiveMouseMove(int mx, int my)
         }
         else if(my <= 147 && my >= 80)
         {
-            mciSendString("play Hover_Sound", NULL, 0, NULL);
             menu.Play_Index = 0;
             menu.Credits_Index = 2;
             menu.Help_Index = 4;
@@ -649,12 +645,36 @@ void iPassiveMouseMove(int mx, int my)
     }
     else
     {
-
         menu.Play_Index = 0;
         menu.Credits_Index = 2;
         menu.Help_Index = 4;
         menu.Sound_Index = 6;
         menu.Exit_Index = 8;
+    }
+
+    if(my >= 250 && my <= 317 && games.exit_press)
+    {
+        if(mx >= 410 && mx <= 610)
+        {
+            games.exit_yes_index = 1;
+            games.exit_no_index = 0;
+        }
+        else if(mx >= 910 && mx <= 1110)
+        {
+            games.exit_yes_index = 0;
+            games.exit_no_index = 1;
+        }
+        else
+        {
+            games.exit_yes_index = 0;
+            games.exit_no_index = 0;
+        }
+    }
+    else
+    {
+
+        games.exit_yes_index = 0;
+        games.exit_no_index = 0;
     }
 
     //For_Page 3 to 5 Back Button
@@ -767,11 +787,12 @@ void iMouse(int button, int state, int mx, int my)
     }
 
     //For_Page 2
-    if(mx >= 1100 && mx <= 1300 && games.Page == 2)
+    if(mx >= 1100 && mx <= 1300 && games.Page == 2 && !games.exit_press)
     {
         if(my <= 467 && my >= 400 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-            mciSendString("play Select_Sound", NULL, 0, NULL);
+
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             games.Page = 3;
             iResumeTimer(games.Level_1_Icons_Animation_ID);
             Level_Icon_Size_Setter();
@@ -779,17 +800,20 @@ void iMouse(int button, int state, int mx, int my)
         }
         else if(my <= 387 && my >= 320 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-            mciSendString("play Select_Sound", NULL, 0, NULL);
+
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             games.Page = 4;
         }
         else if(my <= 307 && my >= 240 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-            mciSendString("play Select_Sound", NULL, 0, NULL);
+
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             games.Page = 5;
         }
         else if(my <= 227 && my >= 160 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-            mciSendString("play Select_Sound", NULL, 0, NULL);
+
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             if(menu.SOUND_ICON_Index == 0)
             {
                 menu.SOUND_ICON_Index = 1;
@@ -803,11 +827,25 @@ void iMouse(int button, int state, int mx, int my)
         }
         else if(my <= 147 && my >= 80 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
-            mciSendString("play Select_Sound", NULL, 0, NULL);
-            exit(0);
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
+            games.exit_press = true;
         }
 
     }
+
+    if(my >= 250 && my <= 317 && games.exit_press)
+    {
+        if(mx >= 410 && mx <= 610 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            exit(0);
+        }
+        else if(mx >= 910 && mx <= 1110 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            games.exit_press = false;
+        }
+
+    }
+
 
     //For_Page 3 to 5 Back Button
     if(mx >= games.Back_button_X && mx <= games.Back_button_X + 50 && games.Page > 2 && games.Page < 6 && my <= games.Back_button_Y + 50 && my >= games.Back_button_Y)
@@ -919,8 +957,16 @@ int main()
     Load_Menu_Buttons();
     mciSendString("open \"resources\\musics\\Main_bg_sound.mp3\" alias bgsong", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\Intro.mp3\" alias Intro_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\select_effect.mp3\" alias Select_Sound", NULL, 0, NULL);
+    games.exit_text = iLoadImage("resources\\game_texture\\exit\\exit_text.png");
     games.Back_Button = iLoadImage("resources\\game_texture\\ui_buttons\\Back.png");
     menu.Menu_Title = iLoadImage("resources\\game_texture\\menu_textures\\title.png");
+    //
+    games.exit_yes[0] = iLoadImage("resources\\game_texture\\ui_buttons\\YES.png");
+    games.exit_yes[1] = iLoadImage("resources\\game_texture\\ui_buttons\\YES_Black.png");
+    games.exit_no[0] = iLoadImage("resources\\game_texture\\ui_buttons\\NO.png");
+    games.exit_no[1] = iLoadImage("resources\\game_texture\\ui_buttons\\NO_Black.png");
+    //
     iSetTimer(16, blinking_Cursour);
     hero.Hero_Animation_Standing = iSetTimer(300, Hero_Standing_Animation);
     iPauseTimer(hero.Hero_Animation_Standing);
