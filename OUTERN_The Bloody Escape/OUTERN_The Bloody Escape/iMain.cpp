@@ -44,7 +44,7 @@ struct Intro
 
     void black_Mask_Animation()
     {
-        text_blackmask_X += 4;
+        text_blackmask_X += 10;
     }
 
     void Load_Intro_Textures()
@@ -146,7 +146,7 @@ struct Menu
 
 struct Hero
 {
-    int hero_standing_left[6],hero_standing_right[6],hero_walking_left[18],hero_walking_right[18];                                //hero_textures
+    int hero_standing_left[14],hero_standing_right[14],hero_walking_left[18],hero_walking_right[18];                                //hero_textures
     int hero_texture_load_index,hero_standing_index,hero_walking_index;                                                           //hero_index
     int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
     int Hero_Direction;                                                                                                       //left_right_Direction
@@ -168,11 +168,11 @@ struct Hero
     void Load_Hero_Textures()                                                                                                     //Loading_textures
     {
         char path[120];
-        if(hero_texture_load_index < 6)
+        if(hero_texture_load_index < 14)
         {
-            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Left\\hero_standing_left(%d).png",hero_texture_load_index + 1);
+            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Left\\left (%d).png",hero_texture_load_index + 1);
             hero_standing_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Right\\hero_standing_right(%d).png", hero_texture_load_index + 1);
+            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Right\\right (%d).png", hero_texture_load_index + 1);
             hero_standing_right[hero_texture_load_index] = iLoadImage(path);
         }
         if(hero_texture_load_index < 18)
@@ -187,7 +187,7 @@ struct Hero
 
     void Hero_Standing_Animation()                                                                                              //Standing_timer_animation
     {
-        if(hero_standing_index < 5)
+        if(hero_standing_index < 13)
         {
             hero_standing_index++;
         }
@@ -444,8 +444,7 @@ void iDraw()
             else
             {
                 iPauseTimer(hero.hero_texture_load);
-                iShowImage(0,0,760,855,games.bg_image_1);
-                iShowImage(760,0,760,855,games.bg_image_1);
+                iShowImage(0,0,1520,855,games.bg_image_1);
                 iDelayMS(55);
                 if(!hero.Hero_Direction)
                 {
@@ -968,7 +967,7 @@ int main()
     games.exit_no[1] = iLoadImage("resources\\game_texture\\ui_buttons\\NO_Black.png");
     //
     iSetTimer(16, blinking_Cursour);
-    hero.Hero_Animation_Standing = iSetTimer(300, Hero_Standing_Animation);
+    hero.Hero_Animation_Standing = iSetTimer(150, Hero_Standing_Animation);
     iPauseTimer(hero.Hero_Animation_Standing);
     //Loding_Animation = iSetTimer(30, Load_Texture_Animation);
     //iPauseTimer(Loding_Animation);
