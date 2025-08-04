@@ -147,8 +147,9 @@ struct Menu
 struct Hero
 {
     int hero_standing_left[14],hero_standing_right[14],hero_walking_left[18],hero_walking_right[18],hero_jump_left[17],hero_jump_right[17];
-    int hero_Dodge_left[18],hero_Dodge_right[18],hero_jump2_left[30],hero_jump2_right[30];                            //hero_textures
-    int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index;
+    int hero_Dodge_left[18],hero_Dodge_right[18],hero_jump2_left[30],hero_jump2_right[30];
+    int hero_crouch_left[10],hero_crouch_right[10];                           //hero_textures
+    int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index,hero_crouch_index;
     double hero_jump_index,hero_jump2_index;                                                           //hero_index
     int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
     int Hero_Direction;                                                                                                       //left_right_Direction
@@ -156,6 +157,7 @@ struct Hero
 
     Hero()
     {
+        hero_crouch_index = 0;
         hero_Dodge_index = 0;
         hero_texture_load_index = 0;
         hero_standing_index = 0;
@@ -174,6 +176,13 @@ struct Hero
     void Load_Hero_Textures()                                                                                                     //Loading_textures
     {
         char path[120];
+        if(hero_texture_load_index < 10)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_crouch_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Right\\right (%d).png", hero_texture_load_index + 1);
+            hero_crouch_right[hero_texture_load_index] = iLoadImage(path);
+        }
         if(hero_texture_load_index < 14)
         {
             sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Left\\left (%d).png",hero_texture_load_index + 1);
@@ -233,7 +242,7 @@ struct Games
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
     int Level;
     int bg_image_1,exit_text,exit_yes[2],exit_no[2],exit_yes_index = 0,exit_no_index = 0;
-    bool  A_D_press,jump_press,exit_press,is_Dodge;
+    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch;
     double Back_button_X,Back_button_Y,Back_button_Height,Back_button_Width;
 
     Games()
@@ -245,6 +254,7 @@ struct Games
         jump_press = false;
         exit_press = false;
         is_Dodge = false;
+        is_crouch = false;
 
         Back_button_X = 20;
         Back_button_Y = 785;
@@ -477,11 +487,43 @@ void iDraw()
                 iDelayMS(60);
                 if(!hero.Hero_Direction)
                 {
+
+                    if(games.is_crouch)
+                    {
+                        games.A_D_press = false;
+                        hero.hero_walking_index = 0;
+
+                        if(hero.hero_crouch_index < 4)
+                        {
+                            hero.hero_crouch_index++;
+                            if(hero.hero_crouch_index == 4)
+                            {
+                                games.is_crouch = false;
+                            }
+                        }
+                        else
+                        {
+                            if(hero.hero_crouch_index < 9)
+                            {
+                                 hero.hero_crouch_index++;
+                            }else
+                            {
+                                 hero.hero_crouch_index = 0;
+                                games.is_crouch = false;
+                            }
+                        }
+                    }
+
                     if(games.is_Dodge)
                     {
+                        hero.hero_crouch_index = 0;
+                        games.is_crouch = false;
+                        hero.hero_jump2_index = 0;
+                        hero.hero_jump_index = 0;
+
                         if(hero.hero_Position_X <= 1320)
                         {
-                            hero.hero_Position_X += 30;
+                            hero.hero_Position_X += 5;
                         }
 
                         if(hero.hero_Dodge_index < 17)
@@ -497,7 +539,10 @@ void iDraw()
 
                     if(games.jump_press && !games.A_D_press)
                     {
+                        hero.hero_crouch_index = 0;
+                        games.is_crouch = false;
                         hero.hero_jump2_index = 0;
+
                         hero.hero_Position_Y += hero.yIncreaseDecrease;
                         if(hero.hero_Position_Y >= 410)
                         {
@@ -525,6 +570,10 @@ void iDraw()
 
                     if(games.jump_press && games.A_D_press)
                     {
+                        hero.hero_crouch_index = 0;
+                        games.is_crouch = false;
+                        hero.hero_jump_index = 0;
+
                         hero.hero_Position_Y += hero.yIncreaseDecrease_jump2;
                         if(hero.hero_Position_Y >= 410)
                         {
@@ -552,6 +601,8 @@ void iDraw()
 
                     if(games.A_D_press)
                     {
+                        hero.hero_crouch_index = 0;
+
                         if(hero.hero_Position_X <= 1320)
                         {
                             hero.hero_Position_X += 20;
@@ -580,6 +631,10 @@ void iDraw()
                     {
                         iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump_right[(int)hero.hero_jump_index]);
                     }
+                    else if(games.is_crouch || hero.hero_crouch_index == 4)
+                    {
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_crouch_right[hero.hero_crouch_index]);
+                    }
                     else if(games.A_D_press)
                     {
                         iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_walking_right[hero.hero_walking_index]);
@@ -591,11 +646,42 @@ void iDraw()
                 }
                 else
                 {
+                    if(games.is_crouch)
+                    {
+                        games.A_D_press = false;
+                        hero.hero_walking_index = 0;
+
+                        if(hero.hero_crouch_index < 4)
+                        {
+                            hero.hero_crouch_index++;
+                            if(hero.hero_crouch_index == 4)
+                            {
+                                games.is_crouch = false;
+                            }
+                        }
+                        else
+                        {
+                            if(hero.hero_crouch_index < 9)
+                            {
+                                 hero.hero_crouch_index++;
+                            }else
+                            {
+                                 hero.hero_crouch_index = 0;
+                                games.is_crouch = false;
+                            }
+                        }
+                    }
+
                     if(games.is_Dodge)
                     {
+                        hero.hero_crouch_index = 0;
+                        games.is_crouch = false;
+                        hero.hero_jump2_index = 0;
+                        hero.hero_jump_index = 0;
+
                         if(hero.hero_Position_X >= 0)
                         {
-                            hero.hero_Position_X -= 30;
+                            hero.hero_Position_X -= 5;
                         }
 
                         if(hero.hero_Dodge_index < 17)
@@ -611,7 +697,10 @@ void iDraw()
 
                     if(games.jump_press && !games.A_D_press)
                     {
+                        hero.hero_crouch_index = 0;
+                        games.is_crouch = false;
                         hero.hero_jump2_index = 0;
+
                         hero.hero_Position_Y += hero.yIncreaseDecrease;
                         if(hero.hero_Position_Y >= 410)
                         {
@@ -639,6 +728,10 @@ void iDraw()
 
                     if(games.jump_press && games.A_D_press)
                     {
+                        hero.hero_crouch_index = 0;
+                        games.is_crouch = false;
+                        hero.hero_jump_index = 0;
+
                         hero.hero_Position_Y += hero.yIncreaseDecrease_jump2;
                         if(hero.hero_Position_Y >= 410)
                         {
@@ -666,6 +759,8 @@ void iDraw()
 
                     if(games.A_D_press)
                     {
+                        hero.hero_crouch_index = 0;
+
                         if(hero.hero_Position_X >= 0)
                         {
                             hero.hero_Position_X -= 20;
@@ -693,6 +788,10 @@ void iDraw()
                     else if(games.jump_press )
                     {
                         iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump_left[(int)hero.hero_jump_index]);
+                    }
+                    else if(games.is_crouch || hero.hero_crouch_index == 4)
+                    {
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_crouch_left[hero.hero_crouch_index]);
                     }
                     else if(games.A_D_press)
                     {
@@ -1063,6 +1162,10 @@ void iKeyboard(unsigned char key)
     {
         games.is_Dodge = true;
     }
+    if (key == 'C' || key == 'c')
+    {
+        games.is_crouch = true;
+    }
     if(key == ' ')
     {
         games.jump_press = true;
@@ -1082,6 +1185,10 @@ void iKeyboardUp(unsigned char key,int x,int y)
         games.A_D_press = false;
         hero.hero_walking_index = 0;
     }
+    /* if (key == 'C' || key == 'c')
+     {
+         games.is_crouch = false;
+     }*/
 }
 /*
 function iSpecialKeyboard() is called whenver user hits special keys like-
