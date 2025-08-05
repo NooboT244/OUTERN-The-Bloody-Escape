@@ -148,8 +148,11 @@ struct Hero
 {
     int hero_standing_left[14],hero_standing_right[14],hero_walking_left[18],hero_walking_right[18],hero_jump_left[17],hero_jump_right[17];
     int hero_Dodge_left[18],hero_Dodge_right[18],hero_jump2_left[30],hero_jump2_right[30];
-    int hero_crouch_left[10],hero_crouch_right[10];                           //hero_textures
+    int hero_crouch_left[10],hero_crouch_right[10];
+    int hero_head;
+    int hero_attack_1_left[26],hero_attack_1_right[26],hero_attack_2_left[31],hero_attack_2_right[31],hero_attack_3_left[8],hero_attack_3_right[8];                         //hero_textures
     int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index,hero_crouch_index;
+    int hero_attack_1_index,hero_attack_2_index,hero_attack_3_index;
     double hero_jump_index,hero_jump2_index;                                                           //hero_index
     int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
     int Hero_Direction;                                                                                                       //left_right_Direction
@@ -157,6 +160,9 @@ struct Hero
 
     Hero()
     {
+        hero_attack_3_index = 0;
+        hero_attack_2_index = 0;
+        hero_attack_1_index = 0;
         hero_crouch_index = 0;
         hero_Dodge_index = 0;
         hero_texture_load_index = 0;
@@ -176,6 +182,17 @@ struct Hero
     void Load_Hero_Textures()                                                                                                     //Loading_textures
     {
         char path[120];
+        if(hero_texture_load_index < 1)
+        {
+            hero_head = iLoadImage("resources\\game_texture\\hero\\hero er Khoma.png");
+        }
+        if(hero_texture_load_index < 8)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Pistol\\left\\left (%d).png",hero_texture_load_index + 1);
+            hero_attack_3_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Pistol\\right\\right (%d).png",hero_texture_load_index + 1);
+            hero_attack_3_right[hero_texture_load_index] = iLoadImage(path);
+        }
         if(hero_texture_load_index < 10)
         {
             sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Left\\left (%d).png",hero_texture_load_index + 1);
@@ -211,12 +228,26 @@ struct Hero
             sprintf_s(path, "resources\\game_texture\\hero\\Dodge\\right\\right (%d).png",hero_texture_load_index + 1);
             hero_Dodge_right[hero_texture_load_index] = iLoadImage(path);
         }
+        if(hero_texture_load_index < 26)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Knife\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_attack_1_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Knife\\Right\\right (%d).png",hero_texture_load_index + 1);
+            hero_attack_1_right[hero_texture_load_index] = iLoadImage(path);
+        }
         if(hero_texture_load_index < 30)
         {
             sprintf_s(path, "resources\\game_texture\\hero\\Jump\\Left\\left (%d).png",hero_texture_load_index + 1);
             hero_jump2_left[hero_texture_load_index] = iLoadImage(path);
             sprintf_s(path, "resources\\game_texture\\hero\\Jump\\Right\\right (%d).png",hero_texture_load_index + 1);
             hero_jump2_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 31)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Chain Saw\\left\\left (%d).png",hero_texture_load_index + 1);
+            hero_attack_2_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Chain Saw\\right\\right (%d).png",hero_texture_load_index + 1);
+            hero_attack_2_right[hero_texture_load_index] = iLoadImage(path);
         }
         hero_texture_load_index++;
     }
@@ -240,13 +271,14 @@ struct Games
     int Back_Button;
     double Level_Select_X[3],Level_Select_Y[3], Level_Select_Width[3],Level_Select_Height[3];
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
-    int Level;
+    int Level,key;
     int bg_image_1,exit_text,exit_yes[2],exit_no[2],exit_yes_index = 0,exit_no_index = 0;
-    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch;
+    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch,is_attack;
     double Back_button_X,Back_button_Y,Back_button_Height,Back_button_Width;
 
     Games()
     {
+        key = 1;
         Page = 0;
         Level = 0;
 
@@ -255,6 +287,7 @@ struct Games
         exit_press = false;
         is_Dodge = false;
         is_crouch = false;
+        is_attack = false;
 
         Back_button_X = 20;
         Back_button_Y = 785;
@@ -409,7 +442,7 @@ void iDraw()
         if(intro.text_blackmask_X >= 1700)
         {
             iPauseTimer(intro.blackmask_Move_Animation);
-            games.Page = 1;
+            games.Page = 3;
             Loading_Sound_Texture();
             menu.Menu_Textures_Load = iSetTimer(300, Load_Menu_Textures);
             mciSendString("play bgsong repeat", NULL, 0, NULL);
@@ -484,7 +517,64 @@ void iDraw()
             {
                 iPauseTimer(hero.hero_texture_load);
                 iShowImage(0,0,1520,855,games.bg_image_1);
+                iShowImage(0,705,150,150,hero.hero_head);
                 iDelayMS(60);
+                iSetColor(255,255,255);
+                iRectangle(135,765,200,25);
+                iSetColor(144,42,18);
+                iFilledRectangle(136,766,100,23);
+
+                if(games.is_attack)
+                {
+                    games.is_crouch = false;
+                    hero.hero_crouch_index = 0;
+                    hero.hero_Dodge_index = 0;
+                    games.is_Dodge = false;
+
+                    switch(games.key)
+                    {
+                    case 2:
+
+                        hero.hero_attack_1_index = 0;
+                        hero.hero_attack_3_index = 0;
+                        if(hero.hero_attack_2_index < 30)
+                        {
+                            hero.hero_attack_2_index++;
+                        }
+                        else
+                        {
+                            hero.hero_attack_2_index = 0;
+                        }
+                        break;
+                    case 3:
+
+                        hero.hero_attack_1_index = 0;
+                        hero.hero_attack_2_index = 0;
+                        if(hero.hero_attack_3_index < 7)
+                        {
+                            hero.hero_attack_3_index++;
+                        }
+                        else
+                        {
+                            hero.hero_attack_3_index = 0;
+                        }
+                        break;
+
+                    default:
+
+                        hero.hero_attack_2_index = 0;
+                        hero.hero_attack_3_index = 0;
+                        if(hero.hero_attack_1_index < 25)
+                        {
+                            hero.hero_attack_1_index++;
+                        }
+                        else
+                        {
+                            hero.hero_attack_1_index = 0;
+                        }
+                    }
+                }
+
                 if(!hero.Hero_Direction)
                 {
 
@@ -505,10 +595,11 @@ void iDraw()
                         {
                             if(hero.hero_crouch_index < 9)
                             {
-                                 hero.hero_crouch_index++;
-                            }else
+                                hero.hero_crouch_index++;
+                            }
+                            else
                             {
-                                 hero.hero_crouch_index = 0;
+                                hero.hero_crouch_index = 0;
                                 games.is_crouch = false;
                             }
                         }
@@ -523,7 +614,7 @@ void iDraw()
 
                         if(hero.hero_Position_X <= 1320)
                         {
-                            hero.hero_Position_X += 5;
+                            hero.hero_Position_X += 15;
                         }
 
                         if(hero.hero_Dodge_index < 17)
@@ -619,7 +710,26 @@ void iDraw()
                     }
 
 
-                    if(games.is_Dodge)
+                    if(games.is_attack)
+                    {
+                        switch(games.key)
+                        {
+                        case 2:
+                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_2_right[hero.hero_attack_2_index]);
+                            break;
+                        case 3:
+                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_3_right[hero.hero_attack_3_index]);
+                            break;
+                        default:
+                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_1_right[hero.hero_attack_1_index]);
+                        }
+
+                        if(hero.hero_Position_X <= 1320)
+                        {
+                            hero.hero_Position_X += 3;
+                        }
+                    }
+                    else if(games.is_Dodge)
                     {
                         iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/14,Default_window_height/4, hero.hero_Dodge_right[hero.hero_Dodge_index]);
                     }
@@ -637,7 +747,7 @@ void iDraw()
                     }
                     else if(games.A_D_press)
                     {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_walking_right[hero.hero_walking_index]);
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/3.5, hero.hero_walking_right[hero.hero_walking_index]);
                     }
                     else
                     {
@@ -663,10 +773,11 @@ void iDraw()
                         {
                             if(hero.hero_crouch_index < 9)
                             {
-                                 hero.hero_crouch_index++;
-                            }else
+                                hero.hero_crouch_index++;
+                            }
+                            else
                             {
-                                 hero.hero_crouch_index = 0;
+                                hero.hero_crouch_index = 0;
                                 games.is_crouch = false;
                             }
                         }
@@ -681,7 +792,7 @@ void iDraw()
 
                         if(hero.hero_Position_X >= 0)
                         {
-                            hero.hero_Position_X -= 5;
+                            hero.hero_Position_X -= 15;
                         }
 
                         if(hero.hero_Dodge_index < 17)
@@ -776,8 +887,25 @@ void iDraw()
                         }
                     }
 
-
-                    if(games.is_Dodge)
+                    if(games.is_attack)
+                    {
+                        switch(games.key)
+                        {
+                        case 2:
+                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_2_left[hero.hero_attack_2_index]);
+                            break;
+                        case 3:
+                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_3_left[hero.hero_attack_3_index]);
+                            break;
+                        default:
+                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_1_left[hero.hero_attack_1_index]);
+                        }
+                        if(hero.hero_Position_X >= 0)
+                        {
+                            hero.hero_Position_X -= 3;
+                        }
+                    }
+                    else if(games.is_Dodge)
                     {
                         iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/14,Default_window_height/4, hero.hero_Dodge_left[hero.hero_Dodge_index]);
                     }
@@ -795,7 +923,7 @@ void iDraw()
                     }
                     else if(games.A_D_press)
                     {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_walking_left[hero.hero_walking_index]);
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/3.5, hero.hero_walking_left[hero.hero_walking_index]);
                     }
                     else
                     {
@@ -1039,6 +1167,7 @@ void iPassiveMouseMove(int mx, int my)
 
 void iMouse(int button, int state, int mx, int my)
 {
+
     //For_Page 1
     if(games.Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu.menu_Texture_Load_index > 24)
     {
@@ -1138,6 +1267,18 @@ void iMouse(int button, int state, int mx, int my)
         }*/
     }
 
+    if(games.Page == 3 && games.Level && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        games.is_attack = true;
+    }
+    else
+    {
+        games.is_attack = false;
+        hero.hero_attack_1_index = 0;
+        hero.hero_attack_2_index = 0;
+        hero.hero_attack_3_index = 0;
+    }
+
 }
 
 /*
@@ -1166,6 +1307,20 @@ void iKeyboard(unsigned char key)
     {
         games.is_crouch = true;
     }
+
+    if (key == '1')
+    {
+        games.key = 1;
+    }
+    if (key == '2')
+    {
+        games.key = 2;
+    }
+    if (key == '3')
+    {
+        games.key = 3;
+    }
+
     if(key == ' ')
     {
         games.jump_press = true;
@@ -1225,6 +1380,7 @@ void iSpecialKeyboard(unsigned char key)
 int main()
 {
     iInitialize(Default_window_width, Default_window_height, "OUTERN : The Bloody Escape");
+    //ShowCursor(FALSE);
     glutKeyboardUpFunc(iKeyboardUp);
     Load_Intro_Textures();
     Load_waiting_page_texture();
