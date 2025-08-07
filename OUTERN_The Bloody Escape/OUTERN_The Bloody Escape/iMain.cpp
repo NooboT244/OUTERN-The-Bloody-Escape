@@ -144,127 +144,6 @@ struct Menu
     }
 };
 
-struct Hero
-{
-    int hero_standing_left[14],hero_standing_right[14],hero_walking_left[18],hero_walking_right[18],hero_jump_left[17],hero_jump_right[17];
-    int hero_Dodge_left[18],hero_Dodge_right[18],hero_jump2_left[30],hero_jump2_right[30];
-    int hero_crouch_left[10],hero_crouch_right[10];
-    int hero_head;
-    int hero_attack_1_left[26],hero_attack_1_right[26],hero_attack_2_left[31],hero_attack_2_right[31],hero_attack_3_left[8],hero_attack_3_right[8];                         //hero_textures
-    int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index,hero_crouch_index;
-    int hero_attack_1_index,hero_attack_2_index,hero_attack_3_index;
-    double hero_jump_index,hero_jump2_index;                                                           //hero_index
-    int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
-    int Hero_Direction;                                                                                                       //left_right_Direction
-    double hero_Position_X,hero_Position_Y,yIncreaseDecrease,yIncreaseDecrease_jump2;                                                      //hero_position
-
-    Hero()
-    {
-        hero_attack_3_index = 0;
-        hero_attack_2_index = 0;
-        hero_attack_1_index = 0;
-        hero_crouch_index = 0;
-        hero_Dodge_index = 0;
-        hero_texture_load_index = 0;
-        hero_standing_index = 0;
-        hero_walking_index = 0;
-        hero_jump_index = 0;
-        hero_jump2_index = 0;
-        Hero_Direction = 0;
-        hero_Position_X = 20;
-        hero_Position_Y = 210;
-        yIncreaseDecrease = 16.47;
-        yIncreaseDecrease_jump2 = 13.33;
-    }
-
-    //..........functions.........//
-
-    void Load_Hero_Textures()                                                                                                     //Loading_textures
-    {
-        char path[120];
-        if(hero_texture_load_index < 1)
-        {
-            hero_head = iLoadImage("resources\\game_texture\\hero\\hero er Khoma.png");
-        }
-        if(hero_texture_load_index < 8)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Pistol\\left\\left (%d).png",hero_texture_load_index + 1);
-            hero_attack_3_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Pistol\\right\\right (%d).png",hero_texture_load_index + 1);
-            hero_attack_3_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 10)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Left\\left (%d).png",hero_texture_load_index + 1);
-            hero_crouch_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Right\\right (%d).png", hero_texture_load_index + 1);
-            hero_crouch_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 14)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Left\\left (%d).png",hero_texture_load_index + 1);
-            hero_standing_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Right\\right (%d).png", hero_texture_load_index + 1);
-            hero_standing_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 15)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Walking\\Left\\left (%d).png",hero_texture_load_index + 1);
-            hero_walking_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Walking\\Right\\right (%d).png",hero_texture_load_index + 1);
-            hero_walking_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 17)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Vertical jump\\left\\left (%d).png",hero_texture_load_index + 1);
-            hero_jump_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Vertical jump\\right\\right (%d).png",hero_texture_load_index + 1);
-            hero_jump_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 18)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Dodge\\left\\left (%d).png",hero_texture_load_index + 1);
-            hero_Dodge_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Dodge\\right\\right (%d).png",hero_texture_load_index + 1);
-            hero_Dodge_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 26)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Knife\\Left\\left (%d).png",hero_texture_load_index + 1);
-            hero_attack_1_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Knife\\Right\\right (%d).png",hero_texture_load_index + 1);
-            hero_attack_1_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 30)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Jump\\Left\\left (%d).png",hero_texture_load_index + 1);
-            hero_jump2_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Jump\\Right\\right (%d).png",hero_texture_load_index + 1);
-            hero_jump2_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        if(hero_texture_load_index < 31)
-        {
-            sprintf_s(path, "resources\\game_texture\\hero\\Chain Saw\\left\\left (%d).png",hero_texture_load_index + 1);
-            hero_attack_2_left[hero_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\hero\\Chain Saw\\right\\right (%d).png",hero_texture_load_index + 1);
-            hero_attack_2_right[hero_texture_load_index] = iLoadImage(path);
-        }
-        hero_texture_load_index++;
-    }
-
-    void Hero_Standing_Animation()                                                                                              //Standing_timer_animation
-    {
-        if(hero_standing_index < 13)
-        {
-            hero_standing_index++;
-        }
-        else
-        {
-            hero_standing_index = 0;
-        }
-    }
-};
-
 struct Games
 {
     int Page,help_page;
@@ -273,7 +152,7 @@ struct Games
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
     int Level,key;
     int bg_image_1,exit_text,exit_yes[2],exit_no[2],exit_yes_index = 0,exit_no_index = 0;
-    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch,is_attack;
+    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch,is_attack,attack_press;
     double Back_button_X,Back_button_Y,Back_button_Height,Back_button_Width;
 
     Games()
@@ -288,6 +167,7 @@ struct Games
         is_Dodge = false;
         is_crouch = false;
         is_attack = false;
+        attack_press = false;
 
         Back_button_X = 20;
         Back_button_Y = 785;
@@ -334,6 +214,355 @@ struct Games
         }
     }
 
+};
+
+Games games;
+void Level_Icon_Size_Setter()
+{
+    games.Level_Icon_Size_Setter();
+}
+void Loading_Level_Icons()
+{
+    games.Loading_Level_Icons();
+}
+void Level_1_Icons_Animation()
+{
+    games.Level_1_Icons_Animation();
+}
+
+struct Hero
+{
+    int hero_standing_left[14],hero_standing_right[14],hero_walking_left[18],hero_walking_right[18],hero_jump_left[17],hero_jump_right[17];
+    int hero_Dodge_left[18],hero_Dodge_right[18],hero_jump2_left[30],hero_jump2_right[30];
+    int hero_crouch_left[10],hero_crouch_right[10];
+    int hero_head;
+    int hero_attack_1_left[26],hero_attack_1_right[26],hero_attack_2_left[31],hero_attack_2_right[31],hero_attack_3_left[24],hero_attack_3_right[24];                         //hero_textures
+    int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index,hero_crouch_index;
+    int hero_attack_1_index,hero_attack_2_index,hero_attack_3_index;
+    double hero_jump_index,hero_jump2_index;                                                           //hero_index
+    int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
+    int Hero_Direction;                                                                                                       //left_right_Direction
+    double hero_Position_X,hero_Position_Y,yIncreaseDecrease,yIncreaseDecrease_jump2;                                                      //hero_position
+
+    Hero()
+    {
+        hero_attack_3_index = 0;
+        hero_attack_2_index = 0;
+        hero_attack_1_index = 0;
+        hero_crouch_index = 0;
+        hero_Dodge_index = 0;
+        hero_texture_load_index = 0;
+        hero_standing_index = 0;
+        hero_walking_index = 0;
+        hero_jump_index = 0;
+        hero_jump2_index = 0;
+        Hero_Direction = 0;
+        hero_Position_X = 20;
+        hero_Position_Y = 210;
+        yIncreaseDecrease = 16.47;
+        yIncreaseDecrease_jump2 = 13.33;
+    }
+
+    //..........functions.........//
+
+    void Load_Hero_Textures()                                                                                                     //Loading_textures
+    {
+        char path[120];
+        if(hero_texture_load_index < 1)
+        {
+            hero_head = iLoadImage("resources\\game_texture\\hero\\hero er Khoma.png");
+        }
+        if(hero_texture_load_index < 10)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_crouch_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Crouch\\Right\\right (%d).png", hero_texture_load_index + 1);
+            hero_crouch_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 14)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_standing_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Standing\\Right\\right (%d).png", hero_texture_load_index + 1);
+            hero_standing_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 15)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Walking\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_walking_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Walking\\Right\\right (%d).png",hero_texture_load_index + 1);
+            hero_walking_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 17)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Vertical jump\\left\\left (%d).png",hero_texture_load_index + 1);
+            hero_jump_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Vertical jump\\right\\right (%d).png",hero_texture_load_index + 1);
+            hero_jump_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 18)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Dodge\\left\\left (%d).png",hero_texture_load_index + 1);
+            hero_Dodge_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Dodge\\right\\right (%d).png",hero_texture_load_index + 1);
+            hero_Dodge_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 24)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Pistol\\left\\left (%d).png",hero_texture_load_index + 1);
+            hero_attack_3_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Pistol\\right\\right (%d).png",hero_texture_load_index + 1);
+            hero_attack_3_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 26)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Knife\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_attack_1_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Knife\\Right\\right (%d).png",hero_texture_load_index + 1);
+            hero_attack_1_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 30)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Jump\\Left\\left (%d).png",hero_texture_load_index + 1);
+            hero_jump2_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Jump\\Right\\right (%d).png",hero_texture_load_index + 1);
+            hero_jump2_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        if(hero_texture_load_index < 31)
+        {
+            sprintf_s(path, "resources\\game_texture\\hero\\Chain Saw\\left\\left (%d).png",hero_texture_load_index + 1);
+            hero_attack_2_left[hero_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\hero\\Chain Saw\\right\\right (%d).png",hero_texture_load_index + 1);
+            hero_attack_2_right[hero_texture_load_index] = iLoadImage(path);
+        }
+        hero_texture_load_index++;
+    }
+
+    void Hero_Standing_Animation()                                                                                              //Standing_timer_animation
+    {
+        if(hero_standing_index < 13)
+        {
+            hero_standing_index++;
+        }
+        else
+        {
+            hero_standing_index = 0;
+        }
+    }
+
+    void Hero_Attack()
+    {
+        if(!games.is_attack)
+        {
+            hero_attack_1_index = 0;
+            hero_attack_2_index = 0;
+            hero_attack_3_index = 0;
+        }
+        else
+        {
+            games.is_crouch = false;
+            hero_crouch_index = 0;
+            hero_Dodge_index = 0;
+            games.is_Dodge = false;
+
+            switch(games.key)
+            {
+            case 2:
+
+                hero_attack_1_index = 0;
+                hero_attack_3_index = 0;
+                if(hero_attack_2_index < 25)
+                {
+                    hero_attack_2_index++;
+                    if(hero_attack_2_index >= 15 && !games.attack_press)
+                    {
+                        hero_attack_2_index = 26;
+                    }
+                }
+                else if(hero_attack_2_index >= 26)
+                {
+                    hero_attack_2_index++;
+                    if(hero_attack_2_index == 30)
+                    {
+                        games.is_attack = false;
+                    }
+                }
+                else
+                {
+                    hero_attack_2_index = 2;
+                }
+                break;
+            case 3:
+
+                hero_attack_1_index = 0;
+                hero_attack_2_index = 0;
+                if(hero_attack_3_index < 23)
+                {
+                    hero_attack_3_index++;
+                    if(hero_attack_3_index >= 23 && !games.attack_press)
+                    {
+                        games.is_attack = false;
+                    }
+                }
+                else
+                {
+                    hero_attack_3_index = 7;
+                }
+                break;
+
+            default:
+
+                hero_attack_2_index = 0;
+                hero_attack_3_index = 0;
+                if(hero_attack_1_index < 25)
+                {
+                    hero_attack_1_index++;
+                    if(hero_attack_1_index >= 5 && !games.attack_press)
+                    {
+                        games.is_attack = false;
+                    }
+                }
+                else
+                {
+                    hero_attack_1_index = 0;
+                }
+            }
+        }
+    }
+
+    void Hero_Moves()
+    {
+        if(games.is_crouch)
+        {
+            games.A_D_press = false;
+            hero_walking_index = 0;
+
+            if(hero_crouch_index < 4)
+            {
+                hero_crouch_index++;
+                if(hero_crouch_index == 4)
+                {
+                    games.is_crouch = false;
+                }
+            }
+            else
+            {
+                if(hero_crouch_index < 9)
+                {
+                    hero_crouch_index++;
+                }
+                else
+                {
+                    hero_crouch_index = 0;
+                    games.is_crouch = false;
+                }
+            }
+        }
+
+        if(games.is_Dodge)
+        {
+            hero_crouch_index = 0;
+            games.is_crouch = false;
+            hero_jump2_index = 0;
+            hero_jump_index = 0;
+
+            if(hero_Dodge_index < 17)
+            {
+                hero_Dodge_index++;
+            }
+            else
+            {
+                hero_Dodge_index = 0;
+                games.is_Dodge = false;
+            }
+        }
+
+        if(games.jump_press && !games.A_D_press)
+        {
+            hero_crouch_index = 0;
+            games.is_crouch = false;
+            hero_jump2_index = 0;
+
+            hero_Position_Y += yIncreaseDecrease;
+            if(hero_Position_Y >= 410)
+            {
+                yIncreaseDecrease *= -1;
+            }
+            if(hero_Position_Y <= 210)
+            {
+                yIncreaseDecrease *= -1;
+                games.jump_press = false;
+                if(hero_Position_Y < 210)
+                {
+                    hero_Position_Y = 210;
+                }
+            }
+
+            if(hero_jump_index < 16)
+            {
+                hero_jump_index+= 0.5;
+            }
+            else
+            {
+                hero_jump_index = 0;
+            }
+        }
+
+        if(games.jump_press && games.A_D_press)
+        {
+            hero_crouch_index = 0;
+            games.is_crouch = false;
+            hero_jump_index = 0;
+
+            hero_Position_Y += yIncreaseDecrease_jump2;
+            if(hero_Position_Y >= 410)
+            {
+                yIncreaseDecrease_jump2 *= -1;
+            }
+            if(hero_Position_Y <= 210)
+            {
+                yIncreaseDecrease_jump2 *= -1;
+                games.jump_press = false;
+                if(hero_Position_Y < 210)
+                {
+                    hero_Position_Y = 210;
+                }
+            }
+
+            if(hero_jump2_index < 29)
+            {
+                hero_jump2_index += 1;
+            }
+            else
+            {
+                hero_jump2_index = 0;
+            }
+        }
+
+        if(games.A_D_press)
+        {
+            hero_crouch_index = 0;
+
+            if(hero_Position_X <= 1320 && !Hero_Direction)
+            {
+                hero_Position_X += 20;
+            }
+
+            if(hero_Position_X >= 0 && Hero_Direction)
+            {
+                hero_Position_X -= 20;
+            }
+
+            if(hero_walking_index < 14)
+            {
+                hero_walking_index++;
+            }
+            else
+            {
+                hero_walking_index = 0;
+            }
+        }
+    }
 };
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
@@ -386,19 +615,7 @@ void Hero_Standing_Animation()                                                  
     hero.Hero_Standing_Animation();
 }
 
-Games games;
-void Level_Icon_Size_Setter()
-{
-    games.Level_Icon_Size_Setter();
-}
-void Loading_Level_Icons()
-{
-    games.Loading_Level_Icons();
-}
-void Level_1_Icons_Animation()
-{
-    games.Level_1_Icons_Animation();
-}
+
 
 
 void iDraw()
@@ -486,6 +703,8 @@ void iDraw()
     }
     else if(games.Page == 3)
     {
+        iDelayMS(60);
+        //Level
         if(games.Level == 0)
         {
             iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
@@ -508,428 +727,15 @@ void iDraw()
                 iSetColor(255,255,255);
                 iRectangle(200,100,1120,30);
                 iFilledRectangle(205,105,(((hero.hero_texture_load_index < 34)? hero.hero_texture_load_index:33)*1110)/33,20);
-                if(hero.hero_texture_load_index == 7)
-                {
-                    iResumeTimer(hero.Hero_Animation_Standing);
-                }
             }
             else
             {
                 iPauseTimer(hero.hero_texture_load);
+                iResumeTimer(hero.Hero_Animation_Standing);
                 iShowImage(0,0,1520,855,games.bg_image_1);
                 iShowImage(0,705,150,150,hero.hero_head);
-                iDelayMS(60);
-                iSetColor(255,255,255);
-                iRectangle(135,765,200,25);
-                iSetColor(144,42,18);
-                iFilledRectangle(136,766,100,23);
-
-                if(games.is_attack)
-                {
-                    games.is_crouch = false;
-                    hero.hero_crouch_index = 0;
-                    hero.hero_Dodge_index = 0;
-                    games.is_Dodge = false;
-
-                    switch(games.key)
-                    {
-                    case 2:
-
-                        hero.hero_attack_1_index = 0;
-                        hero.hero_attack_3_index = 0;
-                        if(hero.hero_attack_2_index < 30)
-                        {
-                            hero.hero_attack_2_index++;
-                        }
-                        else
-                        {
-                            hero.hero_attack_2_index = 0;
-                        }
-                        break;
-                    case 3:
-
-                        hero.hero_attack_1_index = 0;
-                        hero.hero_attack_2_index = 0;
-                        if(hero.hero_attack_3_index < 7)
-                        {
-                            hero.hero_attack_3_index++;
-                        }
-                        else
-                        {
-                            hero.hero_attack_3_index = 0;
-                        }
-                        break;
-
-                    default:
-
-                        hero.hero_attack_2_index = 0;
-                        hero.hero_attack_3_index = 0;
-                        if(hero.hero_attack_1_index < 25)
-                        {
-                            hero.hero_attack_1_index++;
-                        }
-                        else
-                        {
-                            hero.hero_attack_1_index = 0;
-                        }
-                    }
-                }
-
-                if(!hero.Hero_Direction)
-                {
-
-                    if(games.is_crouch)
-                    {
-                        games.A_D_press = false;
-                        hero.hero_walking_index = 0;
-
-                        if(hero.hero_crouch_index < 4)
-                        {
-                            hero.hero_crouch_index++;
-                            if(hero.hero_crouch_index == 4)
-                            {
-                                games.is_crouch = false;
-                            }
-                        }
-                        else
-                        {
-                            if(hero.hero_crouch_index < 9)
-                            {
-                                hero.hero_crouch_index++;
-                            }
-                            else
-                            {
-                                hero.hero_crouch_index = 0;
-                                games.is_crouch = false;
-                            }
-                        }
-                    }
-
-                    if(games.is_Dodge)
-                    {
-                        hero.hero_crouch_index = 0;
-                        games.is_crouch = false;
-                        hero.hero_jump2_index = 0;
-                        hero.hero_jump_index = 0;
-
-                        if(hero.hero_Position_X <= 1320)
-                        {
-                            hero.hero_Position_X += 15;
-                        }
-
-                        if(hero.hero_Dodge_index < 17)
-                        {
-                            hero.hero_Dodge_index++;
-                        }
-                        else
-                        {
-                            hero.hero_Dodge_index = 0;
-                            games.is_Dodge = false;
-                        }
-                    }
-
-                    if(games.jump_press && !games.A_D_press)
-                    {
-                        hero.hero_crouch_index = 0;
-                        games.is_crouch = false;
-                        hero.hero_jump2_index = 0;
-
-                        hero.hero_Position_Y += hero.yIncreaseDecrease;
-                        if(hero.hero_Position_Y >= 410)
-                        {
-                            hero.yIncreaseDecrease *= -1;
-                        }
-                        if(hero.hero_Position_Y <= 210)
-                        {
-                            hero.yIncreaseDecrease *= -1;
-                            games.jump_press = false;
-                            if(hero.hero_Position_Y < 210)
-                            {
-                                hero.hero_Position_Y = 210;
-                            }
-                        }
-
-                        if(hero.hero_jump_index < 16)
-                        {
-                            hero.hero_jump_index+= 0.5;
-                        }
-                        else
-                        {
-                            hero.hero_jump_index = 0;
-                        }
-                    }
-
-                    if(games.jump_press && games.A_D_press)
-                    {
-                        hero.hero_crouch_index = 0;
-                        games.is_crouch = false;
-                        hero.hero_jump_index = 0;
-
-                        hero.hero_Position_Y += hero.yIncreaseDecrease_jump2;
-                        if(hero.hero_Position_Y >= 410)
-                        {
-                            hero.yIncreaseDecrease_jump2 *= -1;
-                        }
-                        if(hero.hero_Position_Y <= 210)
-                        {
-                            hero.yIncreaseDecrease_jump2 *= -1;
-                            games.jump_press = false;
-                            if(hero.hero_Position_Y < 210)
-                            {
-                                hero.hero_Position_Y = 210;
-                            }
-                        }
-
-                        if(hero.hero_jump2_index < 29)
-                        {
-                            hero.hero_jump2_index += 1;
-                        }
-                        else
-                        {
-                            hero.hero_jump2_index = 0;
-                        }
-                    }
-
-                    if(games.A_D_press)
-                    {
-                        hero.hero_crouch_index = 0;
-
-                        if(hero.hero_Position_X <= 1320)
-                        {
-                            hero.hero_Position_X += 20;
-                        }
-
-                        if(hero.hero_walking_index < 14)
-                        {
-                            hero.hero_walking_index++;
-                        }
-                        else
-                        {
-                            hero.hero_walking_index = 0;
-                        }
-                    }
 
 
-                    if(games.is_attack)
-                    {
-                        switch(games.key)
-                        {
-                        case 2:
-                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_2_right[hero.hero_attack_2_index]);
-                            break;
-                        case 3:
-                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_3_right[hero.hero_attack_3_index]);
-                            break;
-                        default:
-                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_1_right[hero.hero_attack_1_index]);
-                        }
-
-                        if(hero.hero_Position_X <= 1320)
-                        {
-                            hero.hero_Position_X += 3;
-                        }
-                    }
-                    else if(games.is_Dodge)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/14,Default_window_height/4, hero.hero_Dodge_right[hero.hero_Dodge_index]);
-                    }
-                    else if(games.jump_press && games.A_D_press)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump2_right[(int)hero.hero_jump2_index]);
-                    }
-                    else if(games.jump_press )
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump_right[(int)hero.hero_jump_index]);
-                    }
-                    else if(games.is_crouch || hero.hero_crouch_index == 4)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_crouch_right[hero.hero_crouch_index]);
-                    }
-                    else if(games.A_D_press)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/3.5, hero.hero_walking_right[hero.hero_walking_index]);
-                    }
-                    else
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/9.5,Default_window_height/3.5, hero.hero_standing_right[hero.hero_standing_index]);
-                    }
-                }
-                else
-                {
-                    if(games.is_crouch)
-                    {
-                        games.A_D_press = false;
-                        hero.hero_walking_index = 0;
-
-                        if(hero.hero_crouch_index < 4)
-                        {
-                            hero.hero_crouch_index++;
-                            if(hero.hero_crouch_index == 4)
-                            {
-                                games.is_crouch = false;
-                            }
-                        }
-                        else
-                        {
-                            if(hero.hero_crouch_index < 9)
-                            {
-                                hero.hero_crouch_index++;
-                            }
-                            else
-                            {
-                                hero.hero_crouch_index = 0;
-                                games.is_crouch = false;
-                            }
-                        }
-                    }
-
-                    if(games.is_Dodge)
-                    {
-                        hero.hero_crouch_index = 0;
-                        games.is_crouch = false;
-                        hero.hero_jump2_index = 0;
-                        hero.hero_jump_index = 0;
-
-                        if(hero.hero_Position_X >= 0)
-                        {
-                            hero.hero_Position_X -= 15;
-                        }
-
-                        if(hero.hero_Dodge_index < 17)
-                        {
-                            hero.hero_Dodge_index++;
-                        }
-                        else
-                        {
-                            hero.hero_Dodge_index = 0;
-                            games.is_Dodge = false;
-                        }
-                    }
-
-                    if(games.jump_press && !games.A_D_press)
-                    {
-                        hero.hero_crouch_index = 0;
-                        games.is_crouch = false;
-                        hero.hero_jump2_index = 0;
-
-                        hero.hero_Position_Y += hero.yIncreaseDecrease;
-                        if(hero.hero_Position_Y >= 410)
-                        {
-                            hero.yIncreaseDecrease *= -1;
-                        }
-                        if(hero.hero_Position_Y <= 210)
-                        {
-                            hero.yIncreaseDecrease *= -1;
-                            games.jump_press = false;
-                            if(hero.hero_Position_Y < 210)
-                            {
-                                hero.hero_Position_Y = 210;
-                            }
-                        }
-
-                        if(hero.hero_jump_index < 16)
-                        {
-                            hero.hero_jump_index += 0.5;
-                        }
-                        else
-                        {
-                            hero.hero_jump_index = 0;
-                        }
-                    }
-
-                    if(games.jump_press && games.A_D_press)
-                    {
-                        hero.hero_crouch_index = 0;
-                        games.is_crouch = false;
-                        hero.hero_jump_index = 0;
-
-                        hero.hero_Position_Y += hero.yIncreaseDecrease_jump2;
-                        if(hero.hero_Position_Y >= 410)
-                        {
-                            hero.yIncreaseDecrease_jump2 *= -1;
-                        }
-                        if(hero.hero_Position_Y <= 210)
-                        {
-                            hero.yIncreaseDecrease_jump2 *= -1;
-                            games.jump_press = false;
-                            if(hero.hero_Position_Y < 210)
-                            {
-                                hero.hero_Position_Y = 210;
-                            }
-                        }
-
-                        if(hero.hero_jump2_index < 29)
-                        {
-                            hero.hero_jump2_index++;
-                        }
-                        else
-                        {
-                            hero.hero_jump2_index = 0;
-                        }
-                    }
-
-                    if(games.A_D_press)
-                    {
-                        hero.hero_crouch_index = 0;
-
-                        if(hero.hero_Position_X >= 0)
-                        {
-                            hero.hero_Position_X -= 20;
-                        }
-
-                        if(hero.hero_walking_index < 14)
-                        {
-                            hero.hero_walking_index++;
-                        }
-                        else
-                        {
-                            hero.hero_walking_index = 0;
-                        }
-                    }
-
-                    if(games.is_attack)
-                    {
-                        switch(games.key)
-                        {
-                        case 2:
-                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_2_left[hero.hero_attack_2_index]);
-                            break;
-                        case 3:
-                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_3_left[hero.hero_attack_3_index]);
-                            break;
-                        default:
-                            iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_1_left[hero.hero_attack_1_index]);
-                        }
-                        if(hero.hero_Position_X >= 0)
-                        {
-                            hero.hero_Position_X -= 3;
-                        }
-                    }
-                    else if(games.is_Dodge)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/14,Default_window_height/4, hero.hero_Dodge_left[hero.hero_Dodge_index]);
-                    }
-                    else if(games.jump_press && games.A_D_press)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump2_left[(int)hero.hero_jump2_index]);
-                    }
-                    else if(games.jump_press )
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump_left[(int)hero.hero_jump_index]);
-                    }
-                    else if(games.is_crouch || hero.hero_crouch_index == 4)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_crouch_left[hero.hero_crouch_index]);
-                    }
-                    else if(games.A_D_press)
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/3.5, hero.hero_walking_left[hero.hero_walking_index]);
-                    }
-                    else
-                    {
-                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/9.5,Default_window_height/3.5, hero.hero_standing_left[hero.hero_standing_index]);
-                    }
-                }
             }
         }
         else if(games.Level == 2)
@@ -941,6 +747,127 @@ void iDraw()
 
         }
 
+        //HERO
+        if(games.Level && hero.hero_texture_load_index >= 36)
+        {
+            iSetColor(255,255,255);
+            iRectangle(135,765,200,25);
+            iSetColor(144,42,18);
+            iFilledRectangle(136,766,100,23);
+
+            hero.Hero_Attack();
+            hero.Hero_Moves();
+
+            if(!hero.Hero_Direction)
+            {
+                if(games.is_attack)
+                {
+                    switch(games.key)
+                    {
+                    case 2:
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_2_right[hero.hero_attack_2_index]);
+                        if(hero.hero_Position_X <= 1320)
+                        {
+                            hero.hero_Position_X += 3;
+                        }
+                        break;
+                    case 3:
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_3_right[hero.hero_attack_3_index]);
+                        break;
+                    default:
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_1_right[hero.hero_attack_1_index]);
+                        if(hero.hero_Position_X <= 1320)
+                        {
+                            hero.hero_Position_X += 3;
+                        }
+                    }
+
+
+                }
+                else if(games.is_Dodge)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/14,Default_window_height/4, hero.hero_Dodge_right[hero.hero_Dodge_index]);
+                    if(hero.hero_Position_X <= 1320)
+                    {
+                        hero.hero_Position_X += 15;
+                    }
+                }
+                else if(games.jump_press && games.A_D_press)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump2_right[(int)hero.hero_jump2_index]);
+                }
+                else if(games.jump_press )
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump_right[(int)hero.hero_jump_index]);
+                }
+                else if(games.is_crouch || hero.hero_crouch_index == 4)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_crouch_right[hero.hero_crouch_index]);
+                }
+                else if(games.A_D_press)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/3.5, hero.hero_walking_right[hero.hero_walking_index]);
+                }
+                else
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/9.5,Default_window_height/3.5, hero.hero_standing_right[hero.hero_standing_index]);
+                }
+            }
+            else
+            {
+                if(games.is_attack)
+                {
+                    switch(games.key)
+                    {
+                    case 2:
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_2_left[hero.hero_attack_2_index]);
+                        if(hero.hero_Position_X >= 0)
+                        {
+                            hero.hero_Position_X -= 3;
+                        }
+                        break;
+                    case 3:
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_3_left[hero.hero_attack_3_index]);
+                        break;
+                    default:
+                        iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero.hero_attack_1_left[hero.hero_attack_1_index]);
+                        if(hero.hero_Position_X >= 0)
+                        {
+                            hero.hero_Position_X -= 3;
+                        }
+                    }
+                }
+                else if(games.is_Dodge)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/14,Default_window_height/4, hero.hero_Dodge_left[hero.hero_Dodge_index]);
+                    if(hero.hero_Position_X >= 0)
+                    {
+                        hero.hero_Position_X -= 15;
+                    }
+                }
+                else if(games.jump_press && games.A_D_press)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump2_left[(int)hero.hero_jump2_index]);
+                }
+                else if(games.jump_press )
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/11,Default_window_height/4, hero.hero_jump_left[(int)hero.hero_jump_index]);
+                }
+                else if(games.is_crouch || hero.hero_crouch_index == 4)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/4, hero.hero_crouch_left[hero.hero_crouch_index]);
+                }
+                else if(games.A_D_press)
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/8.5,Default_window_height/3.5, hero.hero_walking_left[hero.hero_walking_index]);
+                }
+                else
+                {
+                    iShowImage(hero.hero_Position_X,hero.hero_Position_Y,Default_window_width/9.5,Default_window_height/3.5, hero.hero_standing_left[hero.hero_standing_index]);
+                }
+            }
+        }
+        //HERO_END
     }
     else if(games.Page == 4)
     {
@@ -1167,18 +1094,58 @@ void iPassiveMouseMove(int mx, int my)
 
 void iMouse(int button, int state, int mx, int my)
 {
+    //For_Page 3
+    if(games.Page == 3 && games.Level && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        games.is_attack = true;
+        games.attack_press = true;
+    }
+    else
+    {
+        games.attack_press = false;
+    }
 
-    //For_Page 1
-    if(games.Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu.menu_Texture_Load_index > 24)
+    if(my <= 600 && my >= 300 && games.Page == 3 && !games.Level)
+    {
+        if(mx >= 155 && mx <= 455 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            games.Level = 1;
+            games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
+            hero.hero_texture_load = iSetTimer(300,Load_Hero_Textures);
+        }
+        else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            games.Level = 2;
+        }
+        else if(mx >= 1065 && mx <= 1365 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            games.Level = 3;
+        }
+    }
+
+    //For_Page 3 to 5 Back Button
+    if(mx >= games.Back_button_X && mx <= games.Back_button_X + 50 && games.Page > 2 && games.Page < 6 && my <= games.Back_button_Y + 50 && my >= games.Back_button_Y)
     {
         if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
             games.Page = 2;
-            waiting.Tap_To_Continue_Index = 2;
         }
     }
 
     //For_Page 2
+    if(my >= 250 && my <= 317 && games.exit_press)
+    {
+        if(mx >= 410 && mx <= 610 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            exit(0);
+        }
+        else if(mx >= 910 && mx <= 1110 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            games.exit_press = false;
+        }
+
+    }
+
     if(mx >= 1100 && mx <= 1300 && games.Page == 2 && !games.exit_press)
     {
         if(my <= 467 && my >= 400 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -1225,58 +1192,14 @@ void iMouse(int button, int state, int mx, int my)
 
     }
 
-    if(my >= 250 && my <= 317 && games.exit_press)
-    {
-        if(mx >= 410 && mx <= 610 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-        {
-            exit(0);
-        }
-        else if(mx >= 910 && mx <= 1110 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-        {
-            games.exit_press = false;
-        }
-
-    }
-
-
-    //For_Page 3 to 5 Back Button
-    if(mx >= games.Back_button_X && mx <= games.Back_button_X + 50 && games.Page > 2 && games.Page < 6 && my <= games.Back_button_Y + 50 && my >= games.Back_button_Y)
+    //For_Page 1
+    if(games.Page == 1 && mx >= (Default_window_width/2) - 150 && mx <= (Default_window_width/2) + 150 && my >= 300 && my <= 300+101 && menu.menu_Texture_Load_index > 24)
     {
         if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
             games.Page = 2;
+            waiting.Tap_To_Continue_Index = 2;
         }
-    }
-
-    //For_Page 3
-    if(my <= 600 && my >= 300 && games.Page == 3 && !games.Level)
-    {
-        if(mx >= 155 && mx <= 455 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-        {
-            games.Level = 1;
-            games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
-            hero.hero_texture_load = iSetTimer(300,Load_Hero_Textures);
-        }
-        /*else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-        {
-            Level = 2;
-        }
-        else if(mx >= 1065 && mx <= 1365 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-        {
-            Level = 3;
-        }*/
-    }
-
-    if(games.Page == 3 && games.Level && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
-        games.is_attack = true;
-    }
-    else
-    {
-        games.is_attack = false;
-        hero.hero_attack_1_index = 0;
-        hero.hero_attack_2_index = 0;
-        hero.hero_attack_3_index = 0;
     }
 
 }
