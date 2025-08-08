@@ -565,6 +565,39 @@ struct Hero
     }
 };
 
+struct Enemy
+{
+    int enemy_texture_load_index, enemy_baseball_approach_index;
+    int enemy_baseball_approach_left[8],enemy_baseball_approach_right[8],enemy_baseball_attack_left[18],enemy_baseball_attack_right[18];
+    double enemy_Position_X;
+    Enemy()
+    {
+        enemy_baseball_approach_index = 0;
+        enemy_texture_load_index = 0;
+        enemy_Position_X = 1600;
+    }
+    void Load_Enemy_Textures()                                                                                                     //Loading_textures
+    {
+        char path[170];
+        if(enemy_texture_load_index < 8)
+        {
+            sprintf_s(path, "resources\\game_texture\\enemy\\Baseball bat\\Approaching\\Left\\left (%d).png",enemy_texture_load_index + 1);
+            enemy_baseball_approach_left[enemy_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\enemy\\Baseball bat\\Approaching\\Right\\right (%d).png",enemy_texture_load_index + 1);
+            enemy_baseball_approach_right[enemy_texture_load_index] = iLoadImage(path);
+        }
+        if(enemy_texture_load_index < 18)
+        {
+            sprintf_s(path, "resources\\game_texture\\enemy\\Baseball bat\\Attacking\\Left\\left (%d).png",enemy_texture_load_index + 1);
+            enemy_baseball_attack_left[enemy_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\enemy\\Baseball bat\\Attacking\\Right\\right (%d).png",enemy_texture_load_index + 1);
+            enemy_baseball_attack_right[enemy_texture_load_index] = iLoadImage(path);
+        }
+        enemy_texture_load_index++;
+    }
+
+};
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 Intro intro;
 void blinking_Cursour()
@@ -615,6 +648,7 @@ void Hero_Standing_Animation()                                                  
     hero.Hero_Standing_Animation();
 }
 
+Enemy enemy;
 
 
 
@@ -726,14 +760,15 @@ void iDraw()
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[1]);
                 iSetColor(255,255,255);
                 iRectangle(200,100,1120,30);
+                enemy.Load_Enemy_Textures();
                 iFilledRectangle(205,105,(((hero.hero_texture_load_index < 34)? hero.hero_texture_load_index:33)*1110)/33,20);
+
             }
             else
             {
                 iPauseTimer(hero.hero_texture_load);
-                iResumeTimer(hero.Hero_Animation_Standing);
                 iShowImage(0,0,1520,855,games.bg_image_1);
-                iShowImage(0,705,150,150,hero.hero_head);
+
 
 
             }
@@ -750,8 +785,10 @@ void iDraw()
         //HERO
         if(games.Level && hero.hero_texture_load_index >= 36)
         {
+            iShowImage(0,705,150,150,hero.hero_head);
+            iResumeTimer(hero.Hero_Animation_Standing);
             iSetColor(255,255,255);
-            iRectangle(135,765,200,25);
+            iRectangle(135,765,202,25);
             iSetColor(144,42,18);
             iFilledRectangle(136,766,100,23);
 
@@ -868,6 +905,38 @@ void iDraw()
             }
         }
         //HERO_END
+        if(games.Level && hero.hero_texture_load_index >= 36)
+        {
+            if(hero.hero_Position_X < enemy.enemy_Position_X)
+            {
+                iShowImage(enemy.enemy_Position_X,210,Default_window_width/9.5,Default_window_height/3.5, enemy.enemy_baseball_approach_left[enemy.enemy_baseball_approach_index]);
+                if(enemy.enemy_baseball_approach_index < 7)
+                {
+                    enemy.enemy_baseball_approach_index++;
+                }else
+                {
+                    enemy.enemy_baseball_approach_index = 0;
+                }
+
+                enemy.enemy_Position_X -= 10;
+            }if(hero.hero_Position_X > enemy.enemy_Position_X)
+            {
+                iShowImage(enemy.enemy_Position_X,210,Default_window_width/9.5,Default_window_height/3.5, enemy.enemy_baseball_approach_right[enemy.enemy_baseball_approach_index]);
+                if(enemy.enemy_baseball_approach_index < 7)
+                {
+                    enemy.enemy_baseball_approach_index++;
+                }else
+                {
+                    enemy.enemy_baseball_approach_index = 0;
+                }
+
+                enemy.enemy_Position_X += 10;
+            }else
+            {
+
+            }
+        }
+        //enemy_END
     }
     else if(games.Page == 4)
     {
