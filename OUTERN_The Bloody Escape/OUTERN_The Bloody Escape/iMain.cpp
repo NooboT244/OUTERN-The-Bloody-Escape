@@ -1276,7 +1276,7 @@ void iMouse(int button, int state, int mx, int my)
         {
             games.Level = 1;
             games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
-            hero.hero_texture_load = iSetTimer(300,Load_Hero_Textures);
+            hero.hero_texture_load = iSetTimer(500,Load_Hero_Textures);
         }
         else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
@@ -1500,3 +1500,4 @@ int main()
     iStart();
     return 0;
 }
+
