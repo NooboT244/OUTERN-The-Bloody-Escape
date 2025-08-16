@@ -1,6 +1,7 @@
 #include "iGraphics.h"
 #include <iostream>
 #include <ctime>
+#include <cstdlib>
 #include <thread>
 #define Default_window_width 1520
 #define Default_window_height 855
@@ -148,11 +149,12 @@ struct Games
 {
     int Page,help_page,wave;
     int Back_Button;
+    int game_over_textures[2];
     double Level_Select_X[3],Level_Select_Y[3], Level_Select_Width[3],Level_Select_Height[3];
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
     int Level,key;
     int bg_image_1,exit_text,exit_yes[2],exit_no[2],exit_yes_index = 0,exit_no_index = 0;
-    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch,is_attack,attack_press;
+    bool  A_D_press,jump_press,exit_press,is_Dodge,is_crouch,is_attack,attack_press,is_game_Over_Call;
     double Back_button_X,Back_button_Y,Back_button_Height,Back_button_Width;
 
     Games()
@@ -169,6 +171,7 @@ struct Games
         is_crouch = false;
         is_attack = false;
         attack_press = false;
+        is_game_Over_Call = false;
 
         Back_button_X = 20;
         Back_button_Y = 785;
@@ -215,6 +218,12 @@ struct Games
         }
     }
 
+    void Load_game_over_textures()
+    {
+        game_over_textures[0] = iLoadImage("resources\\game_texture\\Blood dripping\\game_over_tex.png");
+        game_over_textures[1] = iLoadImage("resources\\game_texture\\Blood dripping\\b-001.jpg");
+    }
+
 };
 
 Games games;
@@ -243,7 +252,7 @@ struct Hero
     int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index,hero_crouch_index;
     int hero_attack_1_index,hero_attack_2_index,hero_attack_3_index;
     double hero_jump_index,hero_jump2_index;                                                           //hero_index
-    int hero_texture_load,Hero_Animation_Standing;                                                                                //timer_animation
+    int Hero_Animation_Standing;                                                                                //timer_animation
     int Hero_Direction;                                                                                                       //left_right_Direction
     double hero_Position_X,hero_Position_Y,yIncreaseDecrease,yIncreaseDecrease_jump2;                                                      //hero_position
 
@@ -261,7 +270,7 @@ struct Hero
         hero_jump_index = 0;
         hero_jump2_index = 0;
         Hero_Direction = 0;
-        hero_Position_X = 20;
+        hero_Position_X = 460;
         hero_Position_Y = 210;
         yIncreaseDecrease = 16.47;
         yIncreaseDecrease_jump2 = 13.33;
@@ -731,10 +740,6 @@ void Loading_Sound_Texture()
 }
 
 Hero hero;
-void Load_Hero_Textures()                                                                                                     //Loading_textures
-{
-    hero.Load_Hero_Textures();
-}
 void Hero_Standing_Animation()                                                                                              //Staning_timer_animation
 {
     hero.Hero_Standing_Animation();
@@ -745,6 +750,7 @@ struct Enemy
     int enemy_texture_load_index;
     int enemy_baseball_approach_left[8],enemy_baseball_approach_right[8],enemy_baseball_attack_left[18],enemy_baseball_attack_right[18];
     int enemy_awk_approach_left[12],enemy_awk_approach_right[12],enemy_awk_attack_left[8],enemy_awk_attack_right[8];
+    int boss_razor_approach_left[38],boss_razor_approach_right[38];
     Enemy()
     {
         enemy_texture_load_index = 0;
@@ -778,6 +784,13 @@ struct Enemy
             enemy_baseball_attack_left[enemy_texture_load_index] = iLoadImage(path);
             sprintf_s(path, "resources\\game_texture\\enemy\\Baseball bat\\Attacking\\Right\\right (%d).png",enemy_texture_load_index + 1);
             enemy_baseball_attack_right[enemy_texture_load_index] = iLoadImage(path);
+        }
+        if(enemy_texture_load_index < 38)
+        {
+            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\Approaching\\Left\\left (%d).png",enemy_texture_load_index + 1);
+            boss_razor_approach_left[enemy_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\Approaching\\Right\\right (%d).png",enemy_texture_load_index + 1);
+            boss_razor_approach_right[enemy_texture_load_index] = iLoadImage(path);
         }
         enemy_texture_load_index++;
     }
@@ -1140,6 +1153,12 @@ int Enemy_AWK::index = 0;
 Enemy_AWK enemy_awk[8];
 
 
+struct Boss_Razor
+{
+
+};
+
+
 void iDraw()
 {
     iClear();
@@ -1230,7 +1249,6 @@ void iDraw()
 
         if(games.Level == 0)
         {
-            hero.hero_health = 200;
             iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
             iShowImage(games.Back_button_X,games.Back_button_Y,games.Back_button_Width,games.Back_button_Height, games.Back_Button);
             glLineWidth(5);
@@ -1243,25 +1261,22 @@ void iDraw()
         }
         else if(games.Level == 1)
         {
-            if(hero.hero_texture_load_index < 36)
+            if(enemy.enemy_texture_load_index < 41)
             {
                 glLineWidth(1);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[1]);
                 iSetColor(255,255,255);
                 iRectangle(200,100,1120,30);
+                hero.Load_Hero_Textures();
                 enemy.Load_Enemy_Textures();
-                iFilledRectangle(205,105,(((hero.hero_texture_load_index < 34)? hero.hero_texture_load_index:33)*1110)/33,20);
+                games.Load_game_over_textures();
+                iFilledRectangle(205,105,(((enemy.enemy_texture_load_index < 41)? hero.hero_texture_load_index:40)*1110)/40,20);
 
             }
             else
             {
-                iPauseTimer(hero.hero_texture_load);
                 iShowImage(0,0,1520,855,games.bg_image_1);
-            }
-
-            if(games.Level && hero.hero_texture_load_index >= 36)
-            {
                 glLineWidth(2);
                 iShowImage(0,705,150,150,hero.hero_head);
                 iResumeTimer(hero.Hero_Animation_Standing);
@@ -1271,40 +1286,53 @@ void iDraw()
                 iFilledRectangle(136,766,hero.hero_health,23);
                 hero.Hero_Attack();
                 hero.Hero_Moves();
+
+                if(games.wave == 1)
+                {
+                    enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
+                    enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
+                    if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
+                    {
+                        Enemy_Baseball::index++;
+                    }
+
+                    if(Enemy_Baseball::index == 3)
+                    {
+                        games.wave = 2;
+                    }
+                }
+                else if(games.wave == 2)
+                {
+                    if(Enemy_AWK::index%2 == Enemy_Baseball::index%2)
+                    {
+                        enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
+                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
+                        if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
+                        {
+                            Enemy_Baseball::index++;
+                        }
+                    }
+                    else
+                    {
+                        enemy_awk[Enemy_AWK::index].Enemy_Attack();
+                        enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
+                        if(enemy_awk[Enemy_AWK::index].enemy_health <= 0)
+                        {
+                            Enemy_AWK::index++;
+                        }
+                    }
+                    if(Enemy_AWK::index == 3)
+                    {
+                        games.wave = 3;
+                    }
+                }
+                else
+                {
+
+                }
             }
 
-            if(games.wave == 1)
-            {
-                enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
-                if(enemy_baseball[Enemy_Baseball::index].enemy_health == 0)
-                {
-                    Enemy_Baseball::index++;
-                }
 
-                if(Enemy_Baseball::index == 3)
-                {
-                    games.wave = 2;
-                }
-            }
-            else if(games.wave == 2)
-            {
-                enemy_awk[Enemy_AWK::index].Enemy_Attack();
-                enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
-                if(enemy_awk[Enemy_AWK::index].enemy_health == 0)
-                {
-                    Enemy_AWK::index++;
-                }
-
-                if(Enemy_AWK::index == 3)
-                {
-                    games.wave = 3;
-                }
-            }
-            else
-            {
-
-            }
         }
         else if(games.Level == 2)
         {
@@ -1317,7 +1345,9 @@ void iDraw()
 
         if(hero.hero_health == 0)
         {
-            games.Level = 0;
+            iShowImage(0,0,Default_window_width,Default_window_height,games.game_over_textures[1]);
+            iShowImage(0,0,Default_window_width,Default_window_height,games.game_over_textures[0]);
+            games.is_game_Over_Call = true;
         }
     }
     else if(games.Page == 4)
@@ -1562,7 +1592,6 @@ void iMouse(int button, int state, int mx, int my)
         {
             games.Level = 1;
             games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
-            hero.hero_texture_load = iSetTimer(300,Load_Hero_Textures);
         }
         else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
@@ -1663,41 +1692,54 @@ key- holds the ASCII value of the key pressed.
 
 void iKeyboard(unsigned char key)
 {
-    if (key == 'D' || key == 'd')
+    if(!games.is_game_Over_Call)
     {
-        hero.Hero_Direction = 0;
-        games.A_D_press = true;
-    }
-    if (key == 'A' || key == 'a')
-    {
-        hero.Hero_Direction = 1;
-        games.A_D_press = true;
-    }
-    if (key == 'E' || key == 'e')
-    {
-        games.is_Dodge = true;
-    }
-    if (key == 'C' || key == 'c')
-    {
-        games.is_crouch = true;
-    }
+        if (key == 'D' || key == 'd')
+        {
+            hero.Hero_Direction = 0;
+            games.A_D_press = true;
+        }
+        if (key == 'A' || key == 'a')
+        {
+            hero.Hero_Direction = 1;
+            games.A_D_press = true;
+        }
+        if (key == 'E' || key == 'e')
+        {
+            games.is_Dodge = true;
+        }
+        if (key == 'C' || key == 'c')
+        {
+            games.is_crouch = true;
+        }
 
-    if (key == '1')
-    {
-        games.key = 1;
-    }
-    if (key == '2')
-    {
-        games.key = 2;
-    }
-    if (key == '3')
-    {
-        games.key = 3;
-    }
+        if (key == '1')
+        {
+            games.key = 1;
+        }
+        if (key == '2')
+        {
+            games.key = 2;
+        }
+        if (key == '3')
+        {
+            games.key = 3;
+        }
 
-    if(key == ' ')
+        if(key == ' ')
+        {
+            games.jump_press = true;
+        }
+
+    }
+    else
     {
-        games.jump_press = true;
+        if(key == '\r')
+        {
+            games.Level = 0;
+            hero.hero_health = 200;
+            hero.hero_Position_X = 460;
+        }
     }
 
     if(key == 27 && games.Page == 3 && games.Level > 0)
@@ -1753,6 +1795,7 @@ void iSpecialKeyboard(unsigned char key)
 
 int main()
 {
+    srand(time(0));
     iInitialize(Default_window_width, Default_window_height, "OUTERN : The Bloody Escape");
     //ShowCursor(FALSE);
     glutKeyboardUpFunc(iKeyboardUp);
@@ -1783,6 +1826,7 @@ int main()
 
     intro.blackmask_Move_Animation = iSetTimer(16, black_Mask_Animation);
     iSetTimer(80, Menu_background_texture_Animation);
+
     iStart();
     return 0;
 }
