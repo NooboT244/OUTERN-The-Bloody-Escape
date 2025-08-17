@@ -147,8 +147,8 @@ struct Menu
 
 struct Games
 {
-    int Page,help_page,wave;
-    int Back_Button;
+    int Page,help_page,wave,wave_textures[3],wave_texture_timer_index;
+    int Back_Button,wav_3_first_init;
     int game_over_textures[2];
     double Level_Select_X[3],Level_Select_Y[3], Level_Select_Width[3],Level_Select_Height[3];
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
@@ -162,7 +162,7 @@ struct Games
         key = 1;
         Page = 0;
         Level = 0;
-        wave = 1;
+        wav_3_first_init = 0;
 
         A_D_press = false;
         jump_press = false;
@@ -196,7 +196,12 @@ struct Games
         Level_Select_Height[1] = 300;
         Level_Select_Height[2] = 300;
     }
-
+    void Load_Wave_Texture()
+    {
+        wave_textures[0] = iLoadImage("resources\\game_texture\\Wave_Text\\w1.png");
+        wave_textures[1] = iLoadImage("resources\\game_texture\\Wave_Text\\w2.png");
+        wave_textures[2] = iLoadImage("resources\\game_texture\\Wave_Text\\w3.png");
+    }
     void Loading_Level_Icons()
     {
         for (int i = 1; i <= 8; i++)
@@ -418,30 +423,34 @@ struct Hero
             games.is_crouch = false;
             hero_jump2_index = 0;
 
+
             hero_Position_Y += yIncreaseDecrease;
+
+
             if(hero_Position_Y >= 410)
             {
-                yIncreaseDecrease *= -1;
+                yIncreaseDecrease = -abs(yIncreaseDecrease);
             }
+
+
             if(hero_Position_Y <= 210)
             {
-                yIncreaseDecrease *= -1;
+                hero_Position_Y = 210;
                 games.jump_press = false;
-                if(hero_Position_Y < 210)
-                {
-                    hero_Position_Y = 210;
-                }
+                yIncreaseDecrease = abs(yIncreaseDecrease);
             }
+
 
             if(hero_jump_index < 16)
             {
-                hero_jump_index+= 0.5;
+                hero_jump_index += 0.5;
             }
             else
             {
                 hero_jump_index = 0;
             }
         }
+
 
         if(games.jump_press && games.A_D_press)
         {
@@ -450,18 +459,17 @@ struct Hero
             hero_jump_index = 0;
 
             hero_Position_Y += yIncreaseDecrease_jump2;
+
             if(hero_Position_Y >= 410)
             {
-                yIncreaseDecrease_jump2 *= -1;
+                yIncreaseDecrease_jump2 = -abs(yIncreaseDecrease_jump2);
             }
+
             if(hero_Position_Y <= 210)
             {
-                yIncreaseDecrease_jump2 *= -1;
+                hero_Position_Y = 210;
                 games.jump_press = false;
-                if(hero_Position_Y < 210)
-                {
-                    hero_Position_Y = 210;
-                }
+                yIncreaseDecrease_jump2 = abs(yIncreaseDecrease_jump2);
             }
 
             if(hero_jump2_index < 29)
@@ -473,6 +481,7 @@ struct Hero
                 hero_jump2_index = 0;
             }
         }
+
 
         if(games.A_D_press)
         {
@@ -747,10 +756,10 @@ void Hero_Standing_Animation()                                                  
 
 struct Enemy
 {
-    int enemy_texture_load_index;
+    int enemy_texture_load_index,boss_Icons[3];
     int enemy_baseball_approach_left[8],enemy_baseball_approach_right[8],enemy_baseball_attack_left[18],enemy_baseball_attack_right[18];
     int enemy_awk_approach_left[12],enemy_awk_approach_right[12],enemy_awk_attack_left[8],enemy_awk_attack_right[8];
-    int boss_razor_approach_left[38],boss_razor_approach_right[38];
+    int boss_razor_approach_left[38],boss_razor_approach_right[38],boss_razor_attack_left[51],boss_razor_attack_right[51];
     Enemy()
     {
         enemy_texture_load_index = 0;
@@ -759,6 +768,11 @@ struct Enemy
     void Load_Enemy_Textures()                                                                                                     //Loading_textures
     {
         char path[170];
+        if(!enemy_texture_load_index)
+        {
+            boss_Icons[0] = iLoadImage("resources\\game_texture\\enemy\\Boss_Razor\\razor_er_khoma.png");;
+        }
+
         if(enemy_texture_load_index < 8)
         {
             sprintf_s(path, "resources\\game_texture\\enemy\\Baseball bat\\Approaching\\Left\\left (%d).png",enemy_texture_load_index + 1);
@@ -792,6 +806,13 @@ struct Enemy
             sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\Approaching\\Right\\right (%d).png",enemy_texture_load_index + 1);
             boss_razor_approach_right[enemy_texture_load_index] = iLoadImage(path);
         }
+        if(enemy_texture_load_index < 51)
+        {
+            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\First Attack\\left\\left (%d).png",enemy_texture_load_index + 1);
+            boss_razor_attack_left[enemy_texture_load_index] = iLoadImage(path);
+            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\First Attack\\right\\right (%d).png",enemy_texture_load_index + 1);
+            boss_razor_attack_right[enemy_texture_load_index] = iLoadImage(path);
+        }
         enemy_texture_load_index++;
     }
 
@@ -806,10 +827,10 @@ struct Enemy_Baseball
     int enemy_health;
     Enemy_Baseball()
     {
-        enemy_health = 30;
+        /*enemy_health = 30;
         enemy_attack_index = 0;
         enemy_approach_index = 0;
-        enemy_Position_X = 1600;
+        enemy_Position_X = 1600;*/
     }
 
     void Enemy_Attacked_By_Hero()
@@ -835,22 +856,7 @@ struct Enemy_Baseball
                         enemy_health -= 15;
                     }
                 }
-                else if(enemy_Position_X <= hero.hero_Position_X + 80 && enemy_Position_X >= hero.hero_Position_X - 5)
-                {
-                    if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
-                    {
-                        if(hero.Hero_Direction == 1)
-                        {
-                            enemy_Position_X -= 150;
-                        }
-                        else
-                        {
-                            enemy_Position_X += 150;
-                        }
-                        enemy_health -= 15;
-                    }
-                }
-                else if(enemy_Position_X + 160 >= hero.hero_Position_X + 80 && enemy_Position_X + 160 <= hero.hero_Position_X + 165)
+                else if(hero.hero_Position_X + 80 < enemy_Position_X + 160 && hero.hero_Position_X + 80 > enemy_Position_X)
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
@@ -898,13 +904,6 @@ struct Enemy_Baseball
                         enemy_health -= 5;
                     }
                 }
-                else if(enemy_Position_X <= hero.hero_Position_X + 80 && enemy_Position_X >= hero.hero_Position_X - 5)
-                {
-                    if(hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
-                    {
-                        enemy_health -= 5;
-                    }
-                }
                 else if(enemy_Position_X + 160 >= hero.hero_Position_X + 80 && enemy_Position_X + 160 <= hero.hero_Position_X + 165)
                 {
                     if(hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
@@ -918,7 +917,7 @@ struct Enemy_Baseball
 
     void Enemy_Attack()
     {
-        if(games.Level && hero.hero_texture_load_index >= 36 && enemy_health > 0)
+        if(enemy_health > 0)
         {
             if(hero.hero_Position_X + 140 < enemy_Position_X)
             {
@@ -950,22 +949,38 @@ struct Enemy_Baseball
             }
             else
             {
-                if(hero.hero_Position_X  < enemy_Position_X)
+                enemy_approach_index = 0;
+                if(hero.hero_Position_X  < enemy_Position_X + 80)
                 {
                     iShowImage(enemy_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.enemy_baseball_attack_left[enemy_attack_index++]);
+
                 }
                 else
                 {
                     iShowImage(enemy_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.enemy_baseball_attack_right[enemy_attack_index++]);
+
                 }
                 if(enemy_attack_index == 18)
                 {
                     enemy_attack_index = 0;
-                    if(hero.hero_health > 0)
+                    if(hero.hero_Position_Y <= 270)
                     {
-                        hero.hero_health -= 5;
+                        if(hero.hero_health > 0)
+                        {
+                            hero.hero_health -= 5;
+                        }
+                        if(hero.hero_Position_X <= 1320 && hero.hero_Position_X >= 0)
+                        {
+                            if(hero.hero_Position_X + 80 < enemy_Position_X + 80)
+                            {
+                                hero.hero_Position_X -= 70;
+                            }
+                            else
+                            {
+                                hero.hero_Position_X += 70;
+                            }
+                        }
                     }
-
                 }
             }
         }
@@ -983,10 +998,10 @@ struct Enemy_AWK
     int enemy_health;
     Enemy_AWK()
     {
-        enemy_health = 40;
+        /*enemy_health = 40;
         enemy_attack_index = 0;
         enemy_approach_index = 0;
-        enemy_Position_X = 1600;
+        enemy_Position_X = 1600;*/
     }
 
     void Enemy_Attacked_By_Hero()
@@ -996,7 +1011,7 @@ struct Enemy_AWK
             switch(games.key)
             {
             case 2:
-                if(hero.hero_Position_X + 80 < enemy_Position_X && hero.hero_Position_X + 165 >= enemy_Position_X && hero.Hero_Direction == 0)
+                if(hero.hero_Position_X + 80 <= enemy_Position_X && hero.hero_Position_X + 165 >= enemy_Position_X && hero.Hero_Direction == 0)
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
@@ -1004,7 +1019,7 @@ struct Enemy_AWK
                         enemy_health -= 15;
                     }
                 }
-                else if(hero.hero_Position_X + 80 > enemy_Position_X + 160 && hero.hero_Position_X - 5 <= enemy_Position_X + 160 && hero.Hero_Direction == 1)
+                else if(hero.hero_Position_X + 80 >= enemy_Position_X + 160 && hero.hero_Position_X - 5 <= enemy_Position_X + 160 && hero.Hero_Direction == 1)
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
@@ -1012,7 +1027,22 @@ struct Enemy_AWK
                         enemy_health -= 15;
                     }
                 }
-                else if(enemy_Position_X <= hero.hero_Position_X + 80 && enemy_Position_X >= hero.hero_Position_X - 5)
+                else if(hero.hero_Position_X + 80 < enemy_Position_X + 160 && hero.hero_Position_X + 80 > enemy_Position_X)
+                {
+                    if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
+                    {
+                        if(hero.Hero_Direction == 1)
+                        {
+                            enemy_Position_X -= 150;
+                        }
+                        else
+                        {
+                            enemy_Position_X += 150;
+                        }
+                        enemy_health -= 15;
+                    }
+                }
+                /*else if(enemy_Position_X <= hero.hero_Position_X + 80 && enemy_Position_X >= hero.hero_Position_X - 5)
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
@@ -1041,7 +1071,7 @@ struct Enemy_AWK
                         }
                         enemy_health -= 15;
                     }
-                }
+                }*/
                 break;
             case 3:
                 if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
@@ -1095,7 +1125,7 @@ struct Enemy_AWK
 
     void Enemy_Attack()
     {
-        if(games.Level && hero.hero_texture_load_index >= 36 && enemy_health > 0)
+        if(enemy_health > 0)
         {
             if(hero.hero_Position_X + 140 < enemy_Position_X)
             {
@@ -1127,6 +1157,7 @@ struct Enemy_AWK
             }
             else
             {
+                enemy_approach_index = 0;
                 if(hero.hero_Position_X  < enemy_Position_X)
                 {
                     iShowImage(enemy_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.enemy_awk_attack_left[enemy_attack_index++]);
@@ -1138,11 +1169,24 @@ struct Enemy_AWK
                 if(enemy_attack_index == 8)
                 {
                     enemy_attack_index = 0;
-                    if(hero.hero_health > 0)
+                    if(hero.hero_Position_Y <= 270)
                     {
-                        hero.hero_health -= 5;
+                        if(hero.hero_health > 0)
+                        {
+                            hero.hero_health -= 5;
+                        }
+                        if(hero.hero_Position_X <= 1320 && hero.hero_Position_X >= 0)
+                        {
+                            if(hero.hero_Position_X + 80  < enemy_Position_X + 80)
+                            {
+                                hero.hero_Position_X -= 70;
+                            }
+                            else
+                            {
+                                hero.hero_Position_X += 70;
+                            }
+                        }
                     }
-
                 }
             }
         }
@@ -1150,14 +1194,194 @@ struct Enemy_AWK
 
 };
 int Enemy_AWK::index = 0;
-Enemy_AWK enemy_awk[8];
+Enemy_AWK enemy_awk[6];
 
 
 struct Boss_Razor
 {
+    int boss_approach_index,boss_attack_index;
+    double boss_Position_X;
+    int boss_health;
 
+    Boss_Razor()
+    {
+        /*boss_health = 100;
+        boss_approach_index = 0;
+        boss_attack_index = 0;
+        boss_Position_X = 1600;*/
+    }
+
+    void Boss_Attacked_By_Hero()
+    {
+        if(games.is_attack)
+        {
+            switch(games.key)
+            {
+            case 2:
+                if(hero.hero_Position_X + 80 <= boss_Position_X && hero.hero_Position_X + 165 >= boss_Position_X && hero.Hero_Direction == 0)
+                {
+                    if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
+                    {
+                        boss_Position_X += 150;
+                        boss_health -= 15;
+                    }
+                }
+                else if(hero.hero_Position_X + 80 >= boss_Position_X + 325 && hero.hero_Position_X - 5 <= boss_Position_X + 325 && hero.Hero_Direction == 1)
+                {
+                    if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
+                    {
+                        boss_Position_X -= 150;
+                        boss_health -= 15;
+                    }
+                }
+                else if(hero.hero_Position_X + 80 < boss_Position_X + 325 && hero.hero_Position_X + 80 > boss_Position_X)
+                {
+                    if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
+                    {
+                        if(hero.Hero_Direction == 1)
+                        {
+                            boss_Position_X -= 150;
+                        }
+                        else
+                        {
+                            boss_Position_X += 150;
+                        }
+                        boss_health -= 15;
+                    }
+                }
+                break;
+            case 3:
+                if(boss_Position_X >= 0 && boss_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                {
+                    if(hero.hero_Position_X <= boss_Position_X  && hero.Hero_Direction == 0)
+                    {
+                        boss_health -= 10;
+                        boss_Position_X += 150;
+                    }
+
+                    if(hero.hero_Position_X > boss_Position_X  && hero.Hero_Direction == 1)
+                    {
+                        boss_health -= 10;
+                        boss_Position_X -= 150;
+                    }
+                }
+                break;
+
+            default:
+                if(hero.hero_Position_X + 80 <= boss_Position_X && hero.hero_Position_X + 165 >= boss_Position_X && hero.Hero_Direction == 0)
+                {
+                    if(hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
+                    {
+                        boss_health -= 5;
+                    }
+                }
+                else if(hero.hero_Position_X + 80 >= boss_Position_X + 160 && hero.hero_Position_X - 5 <= boss_Position_X + 160 && hero.Hero_Direction == 1)
+                {
+                    if(hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
+                    {
+                        boss_health -= 5;
+                    }
+                }
+                else if(hero.hero_Position_X + 80 < boss_Position_X + 160 && hero.hero_Position_X + 80 > boss_Position_X)
+                {
+                    if(hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
+                    {
+                        boss_health -= 5;
+                    }
+                }
+            }
+        }
+    }
+
+    void Boss_Attack()
+    {
+        if(boss_health > 0)
+        {
+            if(hero.hero_Position_X + 110 < boss_Position_X)
+            {
+                iShowImage(boss_Position_X,210,640,800, enemy.boss_razor_approach_left[boss_approach_index]);
+                if(boss_approach_index < 37)
+                {
+                    boss_approach_index++;
+                }
+                else
+                {
+                    boss_approach_index = 0;
+                }
+
+                boss_Position_X -= 15;
+            }
+            else if(hero.hero_Position_X - 530 > boss_Position_X)
+            {
+                iShowImage(boss_Position_X,210,640,800, enemy.boss_razor_approach_right[boss_approach_index]);
+                if(boss_approach_index < 37)
+                {
+                    boss_approach_index++;
+                }
+                else
+                {
+                    boss_approach_index = 0;
+                }
+
+                boss_Position_X += 15;
+            }
+            else
+            {
+                boss_approach_index = 0;
+                if(hero.hero_Position_X + 80 < boss_Position_X + 320)
+                {
+                    iShowImage(boss_Position_X,210,560,700, enemy.boss_razor_attack_left[boss_attack_index++]);
+                }
+                else
+                {
+                    iShowImage(boss_Position_X,210,560,700, enemy.boss_razor_attack_right[boss_attack_index++]);
+                }
+                if(boss_attack_index == 51)
+                {
+                    boss_attack_index = 0;
+                }
+                if(boss_attack_index == 20)
+                {
+                    if(hero.hero_health > 0)
+                    {
+                        hero.hero_health -= 15;
+                    }
+                }
+            }
+        }
+    }
 };
+Boss_Razor razor;
 
+void game_initialize()
+{
+
+    games.wave_texture_timer_index = 0;
+    Enemy_Baseball::index = 0;
+    Enemy_AWK::index = 0;
+    games.wav_3_first_init = 0;
+    hero.hero_health = 200;
+    hero.hero_Position_X = 460;
+    games.wave = 1;
+    razor.boss_health = 100;
+    razor.boss_approach_index = 0;
+    razor.boss_attack_index = 0;
+    razor.boss_Position_X = 1600;
+    for(auto &i : enemy_baseball)
+    {
+        i.enemy_health = 30;
+        i.enemy_attack_index = 0;
+        i.enemy_approach_index = 0;
+        i.enemy_Position_X = 1600;
+    }
+    for(auto &i : enemy_awk)
+    {
+        i.enemy_health = 40;
+        i.enemy_attack_index = 0;
+        i.enemy_approach_index = 0;
+        i.enemy_Position_X = 1600;
+    }
+}
 
 void iDraw()
 {
@@ -1261,7 +1485,7 @@ void iDraw()
         }
         else if(games.Level == 1)
         {
-            if(enemy.enemy_texture_load_index < 41)
+            if(enemy.enemy_texture_load_index < 55)
             {
                 glLineWidth(1);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
@@ -1271,13 +1495,18 @@ void iDraw()
                 hero.Load_Hero_Textures();
                 enemy.Load_Enemy_Textures();
                 games.Load_game_over_textures();
-                iFilledRectangle(205,105,(((enemy.enemy_texture_load_index < 41)? hero.hero_texture_load_index:40)*1110)/40,20);
+
+                iFilledRectangle(205,105,(((enemy.enemy_texture_load_index < 53)? hero.hero_texture_load_index:52)*1110)/52,20);
 
             }
             else
             {
+                if(hero.hero_health <= 0)
+                {
+                    games.Level = 4;
+                }
                 iShowImage(0,0,1520,855,games.bg_image_1);
-                glLineWidth(2);
+                glLineWidth(1);
                 iShowImage(0,705,150,150,hero.hero_head);
                 iResumeTimer(hero.Hero_Animation_Standing);
                 iSetColor(255,255,255);
@@ -1289,6 +1518,10 @@ void iDraw()
 
                 if(games.wave == 1)
                 {
+                    if(games.wave_texture_timer_index++ < 20)
+                    {
+                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[0]);
+                    }
                     enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
                     enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
                     if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
@@ -1299,10 +1532,15 @@ void iDraw()
                     if(Enemy_Baseball::index == 3)
                     {
                         games.wave = 2;
+                        games.wave_texture_timer_index = 0;
                     }
                 }
                 else if(games.wave == 2)
                 {
+                    if(games.wave_texture_timer_index++ < 20)
+                    {
+                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[1]);
+                    }
                     if(Enemy_AWK::index%2 == Enemy_Baseball::index%2)
                     {
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
@@ -1324,11 +1562,53 @@ void iDraw()
                     if(Enemy_AWK::index == 3)
                     {
                         games.wave = 3;
+                        games.wave_texture_timer_index = 0;
                     }
                 }
                 else
                 {
+                    if(games.wave_texture_timer_index++ < 20)
+                    {
+                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[2]);
+                    }
+                    if(Enemy_Baseball::index <= 7 || Enemy_AWK::index <= 5)
+                    {
+                        if(!games.wav_3_first_init)
+                        {
+                            enemy_baseball[6].enemy_Position_X = -80;
+                            enemy_awk[3].enemy_Position_X = -80;
+                            enemy_awk[5].enemy_Position_X = -80;
+                            games.wav_3_first_init = 1;
+                        }
 
+                        enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
+                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
+                        if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
+                        {
+                            Enemy_Baseball::index++;
+                        }
+
+                        enemy_awk[Enemy_AWK::index].Enemy_Attack();
+                        enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
+                        if(enemy_awk[Enemy_AWK::index].enemy_health <= 0)
+                        {
+                            Enemy_AWK::index++;
+                        }
+                    }
+                    else
+                    {
+                        iShowImage(1350,705,150,150,enemy.boss_Icons[0]);
+                        iSetColor(255,255,255);
+                        iRectangle(1150,765,202,25);
+                        iSetColor(164,198,57);
+                        iFilledRectangle(1151,766,razor.boss_health*2,23);
+                        razor.Boss_Attack();
+                        razor.Boss_Attacked_By_Hero();
+                        if(razor.boss_health <= 0)
+                        {
+                            games.Level = 2;
+                        }
+                    }
                 }
             }
 
@@ -1342,12 +1622,10 @@ void iDraw()
         {
 
         }
-
-        if(hero.hero_health == 0)
+        else
         {
             iShowImage(0,0,Default_window_width,Default_window_height,games.game_over_textures[1]);
             iShowImage(0,0,Default_window_width,Default_window_height,games.game_over_textures[0]);
-            games.is_game_Over_Call = true;
         }
     }
     else if(games.Page == 4)
@@ -1471,7 +1749,6 @@ void iPassiveMouseMove(int mx, int my)
     }
     else
     {
-
         games.exit_yes_index = 0;
         games.exit_no_index = 0;
     }
@@ -1601,6 +1878,9 @@ void iMouse(int button, int state, int mx, int my)
         {
             games.Level = 3;
         }
+        else
+        {
+        }
     }
 
     //For_Page 3 to 5 Back Button
@@ -1692,7 +1972,8 @@ key- holds the ASCII value of the key pressed.
 
 void iKeyboard(unsigned char key)
 {
-    if(!games.is_game_Over_Call)
+
+    if(games.Page == 3 && games.Level > 0 && games.Level < 4 && enemy.enemy_texture_load_index >= 55)
     {
         if (key == 'D' || key == 'd')
         {
@@ -1730,22 +2011,20 @@ void iKeyboard(unsigned char key)
         {
             games.jump_press = true;
         }
-
-    }
-    else
-    {
-        if(key == '\r')
-        {
-            games.Level = 0;
-            hero.hero_health = 200;
-            hero.hero_Position_X = 460;
-        }
     }
 
-    if(key == 27 && games.Page == 3 && games.Level > 0)
+    if(key == '\r' &&  games.Level == 4)
     {
         games.Level = 0;
+        game_initialize();
     }
+
+    if(key == 27 && games.Level > 0 && enemy.enemy_texture_load_index >= 55)
+    {
+        games.Level = 0;
+        games.is_game_Over_Call = false;
+    }
+
 
 }
 void iKeyboardUp(unsigned char key,int x,int y)
@@ -1795,6 +2074,7 @@ void iSpecialKeyboard(unsigned char key)
 
 int main()
 {
+    game_initialize();
     srand(time(0));
     iInitialize(Default_window_width, Default_window_height, "OUTERN : The Bloody Escape");
     //ShowCursor(FALSE);
@@ -1826,7 +2106,7 @@ int main()
 
     intro.blackmask_Move_Animation = iSetTimer(16, black_Mask_Animation);
     iSetTimer(80, Menu_background_texture_Animation);
-
+    games.Load_Wave_Texture();
     iStart();
     return 0;
 }
