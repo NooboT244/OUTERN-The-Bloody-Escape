@@ -1222,7 +1222,6 @@ struct Boss_Razor
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
-                        boss_Position_X += 150;
                         boss_health -= 15;
                     }
                 }
@@ -1230,7 +1229,6 @@ struct Boss_Razor
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
-                        boss_Position_X -= 150;
                         boss_health -= 15;
                     }
                 }
@@ -1238,14 +1236,6 @@ struct Boss_Razor
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
-                        if(hero.Hero_Direction == 1)
-                        {
-                            boss_Position_X -= 150;
-                        }
-                        else
-                        {
-                            boss_Position_X += 150;
-                        }
                         boss_health -= 15;
                     }
                 }
@@ -1256,13 +1246,13 @@ struct Boss_Razor
                     if(hero.hero_Position_X <= boss_Position_X  && hero.Hero_Direction == 0)
                     {
                         boss_health -= 10;
-                        boss_Position_X += 150;
+                        boss_Position_X += 70;
                     }
 
                     if(hero.hero_Position_X > boss_Position_X  && hero.Hero_Direction == 1)
                     {
                         boss_health -= 10;
-                        boss_Position_X -= 150;
+                        boss_Position_X -= 70;
                     }
                 }
                 break;
@@ -1357,13 +1347,14 @@ void game_initialize()
 {
 
     games.wave_texture_timer_index = 0;
+	games.key = 1;
     Enemy_Baseball::index = 0;
     Enemy_AWK::index = 0;
     games.wav_3_first_init = 0;
     hero.hero_health = 200;
     hero.hero_Position_X = 460;
     games.wave = 1;
-    razor.boss_health = 100;
+    razor.boss_health = 200;
     razor.boss_approach_index = 0;
     razor.boss_attack_index = 0;
     razor.boss_Position_X = 1600;
@@ -1424,7 +1415,7 @@ void iDraw()
         if(intro.text_blackmask_X >= 1700)
         {
             iPauseTimer(intro.blackmask_Move_Animation);
-            games.Page = 3;
+            games.Page = 1;
             Loading_Sound_Texture();
             menu.Menu_Textures_Load = iSetTimer(300, Load_Menu_Textures);
             mciSendString("play bgsong repeat", NULL, 0, NULL);
@@ -1571,7 +1562,7 @@ void iDraw()
                     {
                         iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[2]);
                     }
-                    if(Enemy_Baseball::index <= 7 || Enemy_AWK::index <= 5)
+                    if(Enemy_Baseball::index < 8 || Enemy_AWK::index < 6)
                     {
                         if(!games.wav_3_first_init)
                         {
@@ -1583,16 +1574,13 @@ void iDraw()
 
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
-                        if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
-                        {
-                            Enemy_Baseball::index++;
-                        }
 
                         enemy_awk[Enemy_AWK::index].Enemy_Attack();
                         enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
-                        if(enemy_awk[Enemy_AWK::index].enemy_health <= 0)
+						if (enemy_awk[Enemy_AWK::index].enemy_health <= 0 && enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
                         {
                             Enemy_AWK::index++;
+							Enemy_Baseball::index++;
                         }
                     }
                     else
@@ -1601,12 +1589,13 @@ void iDraw()
                         iSetColor(255,255,255);
                         iRectangle(1150,765,202,25);
                         iSetColor(164,198,57);
-                        iFilledRectangle(1151,766,razor.boss_health*2,23);
+                        iFilledRectangle(1151,766,razor.boss_health,23);
                         razor.Boss_Attack();
                         razor.Boss_Attacked_By_Hero();
                         if(razor.boss_health <= 0)
                         {
-                            games.Level = 2;
+							games.Level = 0;
+							game_initialize();
                         }
                     }
                 }
@@ -1870,7 +1859,7 @@ void iMouse(int button, int state, int mx, int my)
             games.Level = 1;
             games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
         }
-        else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        /*else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
             games.Level = 2;
         }
@@ -1880,7 +1869,7 @@ void iMouse(int button, int state, int mx, int my)
         }
         else
         {
-        }
+        }*/
     }
 
     //For_Page 3 to 5 Back Button
