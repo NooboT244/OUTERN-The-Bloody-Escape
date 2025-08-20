@@ -634,6 +634,11 @@ struct Hero
         {
 
         case 2:
+            if(!hero_attack_2_index)
+            {
+                mciSendString("play Chainsaw_Sound from 2", NULL, 0, NULL);
+            }
+
             if (hero_attack_2_index < 25)
             {
                 hero_attack_2_index++;
@@ -652,6 +657,7 @@ struct Hero
             else
             {
                 hero_attack_2_index = 2;
+                mciSendString("play Chainsaw_Sound from 2", NULL, 0, NULL);
             }
 
 
@@ -660,6 +666,7 @@ struct Hero
                 hero_attack_1_index = 0;
                 hero_attack_3_index = 0;
             }
+
             break;
         case 3:
             if (hero_attack_3_index < 23)
@@ -759,7 +766,7 @@ struct Enemy
     int enemy_texture_load_index,boss_Icons[3];
     int enemy_baseball_approach_left[8],enemy_baseball_approach_right[8],enemy_baseball_attack_left[18],enemy_baseball_attack_right[18];
     int enemy_awk_approach_left[12],enemy_awk_approach_right[12],enemy_awk_attack_left[8],enemy_awk_attack_right[8];
-    int boss_razor_approach_left[38],boss_razor_approach_right[38],boss_razor_attack_left[51],boss_razor_attack_right[51];
+    int boss_razor_approach_left[38],boss_razor_approach_right[38],boss_razor_attack_left[49],boss_razor_attack_right[49];
     Enemy()
     {
         enemy_texture_load_index = 0;
@@ -806,11 +813,11 @@ struct Enemy
             sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\Approaching\\Right\\right (%d).png",enemy_texture_load_index + 1);
             boss_razor_approach_right[enemy_texture_load_index] = iLoadImage(path);
         }
-        if(enemy_texture_load_index < 51)
+        if(enemy_texture_load_index < 49)
         {
-            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\First Attack\\left\\left (%d).png",enemy_texture_load_index + 1);
+            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\First attack\\Left\\left (%d).png",enemy_texture_load_index + 1);
             boss_razor_attack_left[enemy_texture_load_index] = iLoadImage(path);
-            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\First Attack\\right\\right (%d).png",enemy_texture_load_index + 1);
+            sprintf_s(path, "resources\\game_texture\\enemy\\Boss_Razor\\First attack\\Right\\right (%d).png",enemy_texture_load_index + 1);
             boss_razor_attack_right[enemy_texture_load_index] = iLoadImage(path);
         }
         enemy_texture_load_index++;
@@ -844,14 +851,19 @@ struct Enemy_Baseball
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_Position_X += 150;
                         enemy_health -= 15;
+
                     }
                 }
                 else if(hero.hero_Position_X + 80 > enemy_Position_X + 160 && hero.hero_Position_X - 5 <= enemy_Position_X + 160 && hero.Hero_Direction == 1)
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_Position_X -= 150;
                         enemy_health -= 15;
                     }
@@ -860,6 +872,8 @@ struct Enemy_Baseball
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         if(hero.Hero_Direction == 1)
                         {
                             enemy_Position_X -= 150;
@@ -869,6 +883,7 @@ struct Enemy_Baseball
                             enemy_Position_X += 150;
                         }
                         enemy_health -= 15;
+
                     }
                 }
                 break;
@@ -963,7 +978,7 @@ struct Enemy_Baseball
                 if(enemy_attack_index == 18)
                 {
                     enemy_attack_index = 0;
-                    if(hero.hero_Position_Y <= 270)
+                    if(hero.hero_Position_Y <= 270 && !games.is_Dodge)
                     {
                         if(hero.hero_health > 0)
                         {
@@ -985,7 +1000,6 @@ struct Enemy_Baseball
             }
         }
     }
-
 };
 int Enemy_Baseball::index = 0;
 Enemy_Baseball enemy_baseball[8];
@@ -1015,6 +1029,8 @@ struct Enemy_AWK
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_Position_X += 150;
                         enemy_health -= 15;
                     }
@@ -1023,6 +1039,8 @@ struct Enemy_AWK
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_Position_X -= 150;
                         enemy_health -= 15;
                     }
@@ -1031,6 +1049,8 @@ struct Enemy_AWK
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         if(hero.Hero_Direction == 1)
                         {
                             enemy_Position_X -= 150;
@@ -1169,7 +1189,7 @@ struct Enemy_AWK
                 if(enemy_attack_index == 8)
                 {
                     enemy_attack_index = 0;
-                    if(hero.hero_Position_Y <= 270)
+                    if(hero.hero_Position_Y <= 270 && !games.is_Dodge)
                     {
                         if(hero.hero_health > 0)
                         {
@@ -1191,7 +1211,6 @@ struct Enemy_AWK
             }
         }
     }
-
 };
 int Enemy_AWK::index = 0;
 Enemy_AWK enemy_awk[6];
@@ -1222,6 +1241,8 @@ struct Boss_Razor
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 15;
                     }
                 }
@@ -1229,6 +1250,8 @@ struct Boss_Razor
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 15;
                     }
                 }
@@ -1236,6 +1259,8 @@ struct Boss_Razor
                 {
                     if(hero.hero_attack_2_index == 11 || hero.hero_attack_2_index == 24)
                     {
+                        mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
+                        mciSendString("play Chainsaw_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 15;
                     }
                 }
@@ -1320,19 +1345,24 @@ struct Boss_Razor
                 boss_approach_index = 0;
                 if(hero.hero_Position_X + 80 < boss_Position_X + 320)
                 {
-                    iShowImage(boss_Position_X,210,560,700, enemy.boss_razor_attack_left[boss_attack_index++]);
+                    iShowImage(boss_Position_X,210,720,900, enemy.boss_razor_attack_left[boss_attack_index]);
                 }
                 else
                 {
-                    iShowImage(boss_Position_X,210,560,700, enemy.boss_razor_attack_right[boss_attack_index++]);
+                    iShowImage(boss_Position_X,210,720,900, enemy.boss_razor_attack_right[boss_attack_index]);
                 }
-                if(boss_attack_index == 51)
+                if(boss_attack_index < 48)
+                {
+                    boss_attack_index++;
+                }
+                else
                 {
                     boss_attack_index = 0;
                 }
+
                 if(boss_attack_index == 20)
                 {
-                    if(hero.hero_health > 0)
+                    if(hero.hero_health > 0 && !games.is_Dodge)
                     {
                         hero.hero_health -= 15;
                     }
@@ -1347,7 +1377,7 @@ void game_initialize()
 {
 
     games.wave_texture_timer_index = 0;
-	games.key = 1;
+    games.key = 1;
     Enemy_Baseball::index = 0;
     Enemy_AWK::index = 0;
     games.wav_3_first_init = 0;
@@ -1577,10 +1607,10 @@ void iDraw()
 
                         enemy_awk[Enemy_AWK::index].Enemy_Attack();
                         enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
-						if (enemy_awk[Enemy_AWK::index].enemy_health <= 0 && enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
+                        if (enemy_awk[Enemy_AWK::index].enemy_health <= 0 && enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
                         {
                             Enemy_AWK::index++;
-							Enemy_Baseball::index++;
+                            Enemy_Baseball::index++;
                         }
                     }
                     else
@@ -1594,8 +1624,8 @@ void iDraw()
                         razor.Boss_Attacked_By_Hero();
                         if(razor.boss_health <= 0)
                         {
-							games.Level = 0;
-							game_initialize();
+                            games.Level = 0;
+                            game_initialize();
                         }
                     }
                 }
@@ -2075,6 +2105,8 @@ int main()
     mciSendString("open \"resources\\musics\\Main_bg_sound.mp3\" alias bgsong", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\Intro.mp3\" alias Intro_Sound", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\select_effect.mp3\" alias Select_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\Chain saw\\ATK_ChainsawSwipe1.mp3\" alias Chainsaw_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\Chain_saw hit\\sawHit1.mp3\" alias Chainsaw_Hit_Sound", NULL, 0, NULL);
     games.exit_text = iLoadImage("resources\\game_texture\\exit\\exit_text.png");
     games.Back_Button = iLoadImage("resources\\game_texture\\ui_buttons\\Back.png");
     menu.Menu_Title = iLoadImage("resources\\game_texture\\menu_textures\\title.png");
