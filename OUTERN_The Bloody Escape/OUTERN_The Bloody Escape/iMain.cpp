@@ -148,7 +148,7 @@ struct Menu
 struct Games
 {
     int Page,help_page,wave,wave_textures[3],wave_texture_timer_index;
-    int Back_Button,wav_3_first_init;
+    int Back_Button,wav_3_first_init,wav_1_first_init,wav_2_first_init;
     int game_over_textures[2];
     double Level_Select_X[3],Level_Select_Y[3], Level_Select_Width[3],Level_Select_Height[3];
     int Level_1_Icons[8],Level_1_Icons_index = 0,Level_1_Icons_Animation_ID;
@@ -163,6 +163,8 @@ struct Games
         Page = 0;
         Level = 0;
         wav_3_first_init = 0;
+        wav_1_first_init = 0;
+        wav_2_first_init = 0;
 
         A_D_press = false;
         jump_press = false;
@@ -1002,7 +1004,7 @@ struct Enemy_Baseball
     }
 };
 int Enemy_Baseball::index = 0;
-Enemy_Baseball enemy_baseball[8];
+Enemy_Baseball enemy_baseball[10];
 
 struct Enemy_AWK
 {
@@ -1213,7 +1215,7 @@ struct Enemy_AWK
     }
 };
 int Enemy_AWK::index = 0;
-Enemy_AWK enemy_awk[6];
+Enemy_AWK enemy_awk[8];
 
 
 struct Boss_Razor
@@ -1501,8 +1503,8 @@ void iDraw()
             iShowImage(games.Level_Select_X[0],games.Level_Select_Y[0], games.Level_Select_Width[0],games.Level_Select_Height[0],games.Level_1_Icons[games.Level_1_Icons_index]);
             iRectangle(games.Level_Select_X[0],games.Level_Select_Y[0], games.Level_Select_Width[0],games.Level_Select_Height[0]);
             iText(260,250,"Level 1",GLUT_BITMAP_TIMES_ROMAN_24);
-            /*iRectangle(Level_Select_X[1],Level_Select_Y[1], Level_Select_Width[1],Level_Select_Height[1]);
-            iRectangle(Level_Select_X[2],Level_Select_Y[2], Level_Select_Width[2],Level_Select_Height[2]);*/
+            iRectangle(games.Level_Select_X[1],games.Level_Select_Y[1],games.Level_Select_Width[1],games.Level_Select_Height[1]);
+            //iRectangle(Level_Select_X[2],Level_Select_Y[2], Level_Select_Width[2],Level_Select_Height[2]);
         }
         else if(games.Level == 1)
         {
@@ -1624,8 +1626,8 @@ void iDraw()
                         razor.Boss_Attacked_By_Hero();
                         if(razor.boss_health <= 0)
                         {
-                            games.Level = 0;
-                            game_initialize();
+                            games.Level = 2;
+                            games.wave = 1;
                         }
                     }
                 }
@@ -1635,6 +1637,102 @@ void iDraw()
         }
         else if(games.Level == 2)
         {
+
+            if(enemy.enemy_texture_load_index < 55)
+            {
+                glLineWidth(1);
+                iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
+                iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[1]);
+                iSetColor(255,255,255);
+                iRectangle(200,100,1120,30);
+                hero.Load_Hero_Textures();
+                enemy.Load_Enemy_Textures();
+                games.Load_game_over_textures();
+                Enemy_Baseball::index = 8;
+                Enemy_AWK::index = 6;
+
+                iFilledRectangle(205,105,(((enemy.enemy_texture_load_index < 53)? hero.hero_texture_load_index:52)*1110)/52,20);
+
+            }
+            else
+            {
+                if(hero.hero_health <= 0)
+                {
+                    games.Level = 4;
+                }
+                iShowImage(0,0,1520,855,games.bg_image_1);
+                glLineWidth(1);
+                iShowImage(0,705,150,150,hero.hero_head);
+                iResumeTimer(hero.Hero_Animation_Standing);
+                iSetColor(255,255,255);
+                iRectangle(135,765,202,25);
+                iSetColor(144,42,18);
+                iFilledRectangle(136,766,hero.hero_health,23);
+                hero.Hero_Attack();
+                hero.Hero_Moves();
+
+                if(games.wave == 1)
+                {
+                    games.wav_3_first_init = 0;
+                    if(games.wave_texture_timer_index++ < 20)
+                    {
+                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[0]);
+                    }
+
+                    if(Enemy_Baseball::index < 10 || Enemy_AWK::index < 8)
+                    {
+                        if(!games.wav_1_first_init)
+                        {
+                            enemy_baseball[8].enemy_Position_X = -80;
+                            enemy_awk[7].enemy_Position_X = -80;
+                            games.wav_1_first_init = 1;
+                        }
+
+                        if (enemy_awk[Enemy_AWK::index].enemy_health > 0 && Enemy_AWK::index < 8)
+                        {
+                            enemy_awk[Enemy_AWK::index].Enemy_Attack();
+                            enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
+                        }
+
+                        if (enemy_awk[Enemy_AWK::index].enemy_health <= 0 && Enemy_AWK::index < 8)
+                        {
+                            Enemy_AWK::index++;
+                        }
+
+                        if(enemy_baseball[Enemy_Baseball::index].enemy_health > 0 && Enemy_Baseball::index < 10)
+                        {
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
+                        }
+
+                        if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0 && Enemy_Baseball::index < 10)
+                        {
+                            Enemy_Baseball::index++;
+                        }
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else if(games.wave == 2)
+                {
+                    if(games.wave_texture_timer_index++ < 20)
+                    {
+                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[1]);
+                    }
+
+                }
+                else
+                {
+                    if(games.wave_texture_timer_index++ < 20)
+                    {
+                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[2]);
+                    }
+
+                }
+            }
 
         }
         else if(games.Level == 3)
@@ -1889,11 +1987,12 @@ void iMouse(int button, int state, int mx, int my)
             games.Level = 1;
             games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
         }
-        /*else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
             games.Level = 2;
+            games.bg_image_1 = iLoadImage("resources\\game_texture\\game_bg\\bg_1.png");
         }
-        else if(mx >= 1065 && mx <= 1365 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        /*else if(mx >= 1065 && mx <= 1365 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
             games.Level = 3;
         }
