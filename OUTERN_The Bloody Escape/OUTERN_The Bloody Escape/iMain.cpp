@@ -3,8 +3,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <thread>
-constexpr double Default_window_width = 1520;
-constexpr double Default_window_height = 855;
+const double Default_window_width = 1520;
+const double Default_window_height = 855;
 
 
 using namespace std;
@@ -3065,3 +3065,4 @@ int main()
     iStart();
     return 0;
 }
+
