@@ -2055,7 +2055,7 @@ void game_initialize()
     games.wav_2_first_init = 0;
     games.wav_3_first_init = 0;
     hero.hero_health = 200;
-    games.wave = 3;
+    games.wave = 1;
 
     for(auto &i : enemy_baseball)
     {
@@ -2324,7 +2324,7 @@ void iDraw()
                         if(razor.boss_health <= 0)
                         {
                             games.Level = 2;
-                            games.wave = 3;
+                            games.wave = 1;
                             game_initialize();
                         }
                     }
@@ -2511,29 +2511,28 @@ void iDraw()
                             boss_dr.boss_Position_X = 1600;
                             boss_dr.isLoop = 0;
                             boss_dr.timer = 0;
-                            enemy_baseball[3].enemy_Position_X = -80;
-                            enemy_baseball[5].enemy_Position_X = -80;
-                            enemy_baseball[7].enemy_Position_X = -80;
-                            enemy_awk[5].enemy_Position_X = -80;
-                            enemy_awk[7].enemy_Position_X = -80;
+
                             enemy_aws[6].enemy_Position_X = -80;
+
+                            enemy_fat[4].enemy_Position_X = -80;
+                            enemy_fat[4].enemy_Position_Direction = 30;
                         }
                     }
 
-
-
-                   /* if(Enemy_Baseball::index < 8)
+                   if(boss_dr.boss_health <= 100)
                     {
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero(true);
-                    }
-
-                    if(Enemy_AWK::index < 8)
-                    {
-                        enemy_awk[Enemy_AWK::index].Enemy_Life_Bar();
-                        enemy_awk[Enemy_AWK::index].Enemy_Attack();
-                        enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
+                        if(enemy_fat[4].enemy_health > 0)
+                        {
+                            enemy_fat[4].Enemy_Life_Bar();
+                            enemy_fat[4].Enemy_Attack();
+                            enemy_fat[4].Enemy_Attacked_By_Hero();
+                        }
+                        if(enemy_fat[5].enemy_health > 0)
+                        {
+                            enemy_fat[5].Enemy_Life_Bar();
+                            enemy_fat[5].Enemy_Attack();
+                            enemy_fat[5].Enemy_Attacked_By_Hero();
+                        }
                     }
 
                     if(Enemy_AWS::index < 8)
@@ -2541,25 +2540,14 @@ void iDraw()
                         enemy_aws[Enemy_AWS::index].Enemy_Life_Bar();
                         enemy_aws[Enemy_AWS::index].Enemy_Attack();
                         enemy_aws[Enemy_AWS::index].Enemy_Attacked_By_Hero();
+                        if(enemy_aws[Enemy_AWS::index].enemy_health <= 0)
+                        {
+                            Enemy_AWS::index++;
+                        }
                     }
 
 
-                    if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0 && Enemy_Baseball::index < 8)
-                    {
-                        Enemy_Baseball::index++;
-                    }
-
-                    if(enemy_awk[Enemy_AWK::index].enemy_health <= 0 && Enemy_AWK::index < 8)
-                    {
-                        Enemy_AWK::index++;
-                    }
-
-                    if(enemy_aws[Enemy_AWS::index].enemy_health <= 0 && Enemy_AWS::index < 8)
-                    {
-                        Enemy_AWS::index++;
-                    }*/
-
-                    if(boss_dr.boss_health > 0)
+                   if(boss_dr.boss_health > 0)
                     {
                         iShowImage(1350,705,150,150,enemy.boss_Icons[1]);
                         iSetColor(255,255,255);
@@ -2570,7 +2558,7 @@ void iDraw()
                         boss_dr.Boss_Attacked_By_Hero();
                     }
 
-                    if(Enemy_Baseball::index == 8 && Enemy_AWK::index == 8 && Enemy_AWS::index == 8 && boss_dr.boss_health <= 0)
+                    if(Enemy_AWS::index == 8 && boss_dr.boss_health <= 0 && enemy_fat[4].enemy_health <= 0 && enemy_fat[5].enemy_health <= 0)
                     {
                         games.Level = 3;
                         games.wave = 1;
