@@ -786,8 +786,8 @@ struct Enemy
     int boss_razor_approach_left[38],boss_razor_approach_right[38],boss_razor_attack_left[49],boss_razor_attack_right[49];
     int enemy_aws_approach_left[16],enemy_aws_approach_right[16],enemy_aws_attack_left[14],enemy_aws_attack_right[14];
     int enemy_fatRunner_red_left[15],enemy_fatRunner_red_right[15],enemy_fatRunner_pink_left[15],enemy_fatRunner_pink_right[15];
-    int boss_dr_approach_left[25],boss_dr_approach_right[25],boss_dr_attack_left[49],boss_dr_attack_right[49];
-    int boss_dr_attack_Loop_left[9],boss_dr_attack_Loop_right[9];
+    int boss_dr_approach_left[25],boss_dr_approach_right[25],boss_dr_attack_left[66],boss_dr_attack_right[66];
+    int boss_dr_loop_left[9],boss_dr_loop_right[9];
     Enemy()
     {
         enemy_texture_load_index = 0;
@@ -795,7 +795,7 @@ struct Enemy
 
     void Load_Enemy_Textures()                                                                                                     //Loading_textures
     {
-        char path[170];
+        char path[300];
         if(!enemy_texture_load_index)
         {
             boss_Icons[0] = iLoadImage("resources\\game_texture\\enemy\\Boss_Razor\\razor_er_khoma.png");
@@ -817,9 +817,9 @@ struct Enemy
         if(enemy_texture_load_index < 9)
         {
             sprintf_s(path, "resources\\game_texture\\enemy\\DR\\Loop attack\\left\\left (%d).png",enemy_texture_load_index + 1);
-            boss_dr_attack_Loop_left[enemy_texture_load_index] = iLoadImage(path);
+            boss_dr_loop_left[enemy_texture_load_index] = iLoadImage(path);
             sprintf_s(path, "resources\\game_texture\\enemy\\DR\\Loop attack\\right\\right (%d).png",enemy_texture_load_index + 1);
-            boss_dr_attack_Loop_right[enemy_texture_load_index] = iLoadImage(path);
+            boss_dr_loop_right[enemy_texture_load_index] = iLoadImage(path);
         }
         if(enemy_texture_load_index < 12)
         {
@@ -1451,12 +1451,10 @@ struct Enemy_AWS
                 if(hero.hero_Position_X  < enemy_Position_X + 80)
                 {
                     iShowImage(enemy_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.enemy_aws_attack_left[enemy_attack_index++]);
-
                 }
                 else
                 {
                     iShowImage(enemy_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.enemy_aws_attack_right[enemy_attack_index++]);
-
                 }
                 if(enemy_attack_index == 14)
                 {
@@ -1839,7 +1837,7 @@ struct Boss_DR
 
     void Boss_Attacked_By_Hero()
     {
-        if(games.is_attack && boss_health > 0)
+        if(games.is_attack && boss_health > 0 && !(isLoop%2))
         {
             switch(games.key)
             {
@@ -1931,20 +1929,18 @@ struct Boss_DR
     {
         if(boss_health > 0)
         {
-            iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_attack_Loop_left[0]);
-                    boss_Position_X -= 20;
-            /*if(isLoop%2)
+            if(isLoop%2)
             {
                 boss_approach_index = 0;
                 boss_attack_index = 0;
                 if(boss_Position_X > hero.hero_Position_X)
                 {
-                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_attack_Loop_left[boss_attack_loop_index]);
+                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2, enemy.boss_dr_loop_left[boss_attack_loop_index]);
                     boss_Position_X -= 20;
                 }
                 else
                 {
-                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_attack_Loop_right[boss_attack_loop_index]);
+                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2, enemy.boss_dr_loop_right[boss_attack_loop_index]);
                     boss_Position_X += 20;
                 }
 
@@ -1987,7 +1983,7 @@ struct Boss_DR
 
                 if(hero.hero_Position_X + 140 < boss_Position_X)
                 {
-                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_approach_left[boss_approach_index]);
+                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2, enemy.boss_dr_approach_left[boss_approach_index]);
                     if(boss_approach_index < 24)
                     {
                         boss_approach_index++;
@@ -2001,7 +1997,7 @@ struct Boss_DR
                 }
                 else if(hero.hero_Position_X - 170 > boss_Position_X)
                 {
-                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_approach_right[boss_approach_index]);
+                    iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2, enemy.boss_dr_approach_right[boss_approach_index]);
                     if(boss_approach_index < 24)
                     {
                         boss_approach_index++;
@@ -2017,11 +2013,11 @@ struct Boss_DR
                 {
                     if(hero.hero_Position_X + 80 < boss_Position_X + 80)
                     {
-                        iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_attack_left[boss_attack_index]);
+                        iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2, enemy.boss_dr_attack_left[boss_attack_index]);
                     }
                     else
                     {
-                        iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2.5, enemy.boss_dr_attack_right[boss_attack_index]);
+                        iShowImage(boss_Position_X,210,Default_window_width/7,Default_window_height/2, enemy.boss_dr_attack_right[boss_attack_index]);
                     }
 
                     if(boss_attack_index < 65)
@@ -2041,7 +2037,7 @@ struct Boss_DR
                         }
                     }
                 }
-            }*/
+            }
         }
     }
 
@@ -2526,7 +2522,7 @@ void iDraw()
 
 
 
-                    if(Enemy_Baseball::index < 8)
+                   /* if(Enemy_Baseball::index < 8)
                     {
                         enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
@@ -2561,7 +2557,7 @@ void iDraw()
                     if(enemy_aws[Enemy_AWS::index].enemy_health <= 0 && Enemy_AWS::index < 8)
                     {
                         Enemy_AWS::index++;
-                    }
+                    }*/
 
                     if(boss_dr.boss_health > 0)
                     {
