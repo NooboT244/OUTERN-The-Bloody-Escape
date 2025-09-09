@@ -3,8 +3,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <thread>
-constexpr double Default_window_width = 1520;
-constexpr double Default_window_height = 855;
+const double Default_window_width = 1520;
+const double Default_window_height = 855;
 
 
 using namespace std;
@@ -259,7 +259,7 @@ struct Hero
 {
     int hero_standing_left[14],hero_standing_right[14],hero_walking_left[18],hero_walking_right[18],hero_jump_left[17],hero_jump_right[17];
     int hero_Dodge_left[18],hero_Dodge_right[18],hero_jump2_left[30],hero_jump2_right[30];
-    int hero_crouch_left[10],hero_crouch_right[10],BulletSpark[2];
+    int hero_crouch_left[10],hero_crouch_right[10],Bullet[2],BulletPositionX[40],bullet_throw_count,BulletDirection[40];
     int hero_head,hero_health;
     int hero_attack_1_left[26],hero_attack_1_right[26],hero_attack_2_left[31],hero_attack_2_right[31],hero_attack_3_left[24],hero_attack_3_right[24];                         //hero_textures
     int hero_texture_load_index,hero_standing_index,hero_walking_index,hero_Dodge_index,hero_crouch_index;
@@ -267,7 +267,8 @@ struct Hero
     double hero_jump_index,hero_jump2_index;                                                           //hero_index
     int Hero_Animation_Standing;                                                                                //timer_animation
     int Hero_Direction;                                                                                                       //left_right_Direction
-    double hero_Position_X,hero_Position_Y,yIncreaseDecrease,yIncreaseDecrease_jump2;                                                      //hero_position
+    double hero_Position_X,hero_Position_Y,yIncreaseDecrease,yIncreaseDecrease_jump2;
+    bool bullet_status[40];                                                   //hero_position
 
     Hero()
     {
@@ -298,8 +299,8 @@ struct Hero
         {
             games.Load_BG_Images();
             hero_head = iLoadImage("resources\\game_texture\\hero\\hero er Khoma.png");
-            BulletSpark[0] = iLoadImage("resources\\game_texture\\hero\\Bullet_Spark\\left.png");
-            BulletSpark[1] = iLoadImage("resources\\game_texture\\hero\\Bullet_Spark\\right.png");
+            Bullet[0] = iLoadImage("resources\\game_texture\\hero\\Bullet.png");
+            Bullet[1] = iLoadImage("resources\\game_texture\\hero\\Bullet_2.png");
         }
         if(hero_texture_load_index < 10)
         {
@@ -518,6 +519,11 @@ struct Hero
             }
         }
 
+        if(bullet_throw_count >= 40 && games.is_attack && games.key == 3)
+        {
+            games.is_attack = 0;
+        }
+
         if(!Hero_Direction)
         {
             if(games.is_attack)
@@ -533,9 +539,11 @@ struct Hero
                     break;
                 case 3:
                     iShowImage(hero_Position_X,hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero_attack_3_right[hero_attack_3_index]);
-                    if(hero_attack_3_index == 11 || hero_attack_3_index == 12)
+                    if(hero_attack_3_index == 9 || hero_attack_3_index == 10)
                     {
-                        iShowImage(hero_Position_X + 300,395,260,80,BulletSpark[0]);
+                        BulletPositionX[bullet_throw_count] = (hero_Position_X + 210);
+                        BulletDirection[bullet_throw_count] = Hero_Direction;
+                        bullet_status[bullet_throw_count++] = true;
                     }
 
                     break;
@@ -590,11 +598,15 @@ struct Hero
                     }
                     break;
                 case 3:
+
                     iShowImage(hero_Position_X,hero_Position_Y,Default_window_width/7,Default_window_height/2.8,hero_attack_3_left[hero_attack_3_index]);
-                    if(hero_attack_3_index == 11 || hero_attack_3_index == 12)
+                    if(hero_attack_3_index == 9 || hero_attack_3_index == 10)
                     {
-                        iShowImage(hero_Position_X - 300,395,260,80,BulletSpark[1]);
+                        BulletPositionX[bullet_throw_count] = hero_Position_X;
+                        BulletDirection[bullet_throw_count] = Hero_Direction;
+                        bullet_status[bullet_throw_count++] = true;
                     }
+
                     break;
                 default:
                     iShowImage(hero_Position_X,hero_Position_Y,Default_window_width/7,Default_window_height/2.8, hero_attack_1_left[hero_attack_1_index]);
@@ -631,6 +643,39 @@ struct Hero
             else
             {
                 iShowImage(hero_Position_X,hero_Position_Y,160,Default_window_height/3.5, hero_standing_left[hero_standing_index]);
+            }
+        }
+
+
+        for(int i = 0; i < bullet_throw_count; i++)
+        {
+            if(bullet_status[i])
+            {
+                iShowImage(BulletPositionX[i],370,40,20,Bullet[BulletDirection[i]]);
+            }
+
+            if(BulletDirection[i])
+            {
+
+                if(BulletPositionX[i] >= -80)
+                {
+                    BulletPositionX[i] -= 40;
+                }
+                else
+                {
+                    bullet_status[i] = false;
+                }
+            }
+            else
+            {
+                if(BulletPositionX[i] <= 1600)
+                {
+                    BulletPositionX[i] += 40;
+                }
+                else
+                {
+                    bullet_status[i] = false;
+                }
             }
         }
     }
@@ -689,31 +734,30 @@ struct Hero
 
             break;
         case 3:
-            games.A_D_press = false;
-            if (hero_attack_3_index < 23)
+
+            if(bullet_throw_count < 40)
             {
-                hero_attack_3_index++;
-                if (hero_attack_3_index >= 23 && !games.attack_press)
+                games.A_D_press = false;
+                if (hero_attack_3_index < 23)
                 {
-                    hero_attack_3_index = 0;
-                    games.is_attack = false;
+                    hero_attack_3_index++;
+                    if (hero_attack_3_index >= 23 && !games.attack_press)
+                    {
+                        hero_attack_3_index = 0;
+                        games.is_attack = false;
+                    }
                 }
-                if(hero_attack_3_index == 9)
+                else
                 {
+                    hero_attack_3_index = 7;
+                }
 
+                if (hero_attack_3_index == 7)
+                {
+                    hero_attack_1_index = 0;
+                    hero_attack_2_index = 0;
                 }
             }
-            else
-            {
-                hero_attack_3_index = 7;
-            }
-
-            if (hero_attack_3_index == 7)
-            {
-                hero_attack_1_index = 0;
-                hero_attack_2_index = 0;
-            }
-
             break;
         default:
             if (hero_attack_1_index < 25)
@@ -928,9 +972,9 @@ struct Enemy_Baseball
 
     }
 
-    void Enemy_Attacked_By_Hero(bool isHeroNear)
+    void Enemy_Attacked_By_Hero()
     {
-        if(games.is_attack && isHeroNear)
+        if(games.is_attack)
         {
             switch(games.key)
             {
@@ -976,7 +1020,7 @@ struct Enemy_Baseball
                 }
                 break;
             case 3:
-                if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                /*if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
                 {
                     if(hero.hero_Position_X <= enemy_Position_X  && hero.Hero_Direction == 0)
                     {
@@ -989,7 +1033,7 @@ struct Enemy_Baseball
                         enemy_health -= 10;
                         enemy_Position_X -= 150;
                     }
-                }
+                }*/
                 break;
 
             default:
@@ -1014,6 +1058,23 @@ struct Enemy_Baseball
                         enemy_health -= 5;
                     }
                 }
+            }
+        }
+
+        for(int i = 0; i < hero.bullet_throw_count; i++)
+        {
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X += 150;
+
+            }
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X -= 150;
             }
         }
     }
@@ -1192,7 +1253,7 @@ struct Enemy_AWK
                 }*/
                 break;
             case 3:
-                if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                /*if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
                 {
                     if(hero.hero_Position_X <= enemy_Position_X  && hero.Hero_Direction == 0)
                     {
@@ -1205,7 +1266,7 @@ struct Enemy_AWK
                         enemy_health -= 10;
                         enemy_Position_X -= 150;
                     }
-                }
+                }*/
                 break;
 
             default:
@@ -1237,6 +1298,23 @@ struct Enemy_AWK
                         enemy_health -= 5;
                     }
                 }
+            }
+        }
+
+         for(int i = 0; i < hero.bullet_throw_count; i++)
+        {
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X += 150;
+
+            }
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X -= 150;
             }
         }
     }
@@ -1387,7 +1465,7 @@ struct Enemy_AWS
                 }
                 break;
             case 3:
-                if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                /*if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
                 {
                     if(hero.hero_Position_X <= enemy_Position_X  && hero.Hero_Direction == 0)
                     {
@@ -1400,7 +1478,7 @@ struct Enemy_AWS
                         enemy_health -= 10;
                         enemy_Position_X -= 150;
                     }
-                }
+                }*/
                 break;
 
             default:
@@ -1425,6 +1503,23 @@ struct Enemy_AWS
                         enemy_health -= 5;
                     }
                 }
+            }
+        }
+
+        for(int i = 0; i < hero.bullet_throw_count; i++)
+        {
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X += 150;
+
+            }
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X -= 150;
             }
         }
     }
@@ -1567,7 +1662,7 @@ struct Enemy_Fat
                 }
                 break;
             case 3:
-                if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                /*if(enemy_Position_X >= 0 && enemy_Position_X <= 1520 && hero.hero_attack_3_index == 7)
                 {
                     if(hero.hero_Position_X <= enemy_Position_X  && hero.Hero_Direction == 0)
                     {
@@ -1580,7 +1675,7 @@ struct Enemy_Fat
                         enemy_health -= 10;
                         enemy_Position_X -= 150;
                     }
-                }
+                }*/
                 break;
 
             default:
@@ -1605,6 +1700,23 @@ struct Enemy_Fat
                         enemy_health -= 5;
                     }
                 }
+            }
+        }
+
+         for(int i = 0; i < hero.bullet_throw_count; i++)
+        {
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X += 150;
+
+            }
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                enemy_health -= 10;
+                enemy_Position_X -= 150;
             }
         }
     }
@@ -1721,7 +1833,7 @@ struct Boss_Razor
                 }
                 break;
             case 3:
-                if(boss_Position_X >= 0 && boss_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                /*if(boss_Position_X >= 0 && boss_Position_X <= 1520 && hero.hero_attack_3_index == 7)
                 {
                     if(hero.hero_Position_X <= boss_Position_X  && hero.Hero_Direction == 0)
                     {
@@ -1734,7 +1846,7 @@ struct Boss_Razor
                         boss_health -= 10;
                         boss_Position_X -= 70;
                     }
-                }
+                }*/
                 break;
 
             default:
@@ -1759,6 +1871,21 @@ struct Boss_Razor
                         boss_health -= 5;
                     }
                 }
+            }
+        }
+
+        for(int i = 0; i < hero.bullet_throw_count; i++)
+        {
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= boss_Position_X && (hero.BulletPositionX[i] + 40) <= boss_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                boss_health -= 10;
+
+            }
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= boss_Position_X && hero.BulletPositionX[i] <= boss_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                boss_health -= 10;
             }
         }
     }
@@ -1891,7 +2018,7 @@ struct Boss_DR
                 }
                 break;
             case 3:
-                if(boss_Position_X >= 0 && boss_Position_X <= 1520 && hero.hero_attack_3_index == 7)
+                /*if(boss_Position_X >= 0 && boss_Position_X <= 1520 && hero.hero_attack_3_index == 7)
                 {
                     if(hero.hero_Position_X <= boss_Position_X  && hero.Hero_Direction == 0)
                     {
@@ -1904,7 +2031,7 @@ struct Boss_DR
                         boss_health -= 10;
                         boss_Position_X -= 150;
                     }
-                }
+                }*/
                 break;
 
             default:
@@ -1929,6 +2056,20 @@ struct Boss_DR
                         boss_health -= 5;
                     }
                 }
+            }
+        }
+        for(int i = 0; i < hero.bullet_throw_count; i++)
+        {
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= boss_Position_X && (hero.BulletPositionX[i] + 40) <= boss_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                boss_health -= 10;
+
+            }
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= boss_Position_X && hero.BulletPositionX[i] <= boss_Position_X + 160)
+            {
+                hero.bullet_status[i] = 0;
+                boss_health -= 10;
             }
         }
     }
@@ -2064,6 +2205,8 @@ void game_initialize()
     games.wav_3_first_init = 0;
     hero.hero_health = 200;
     games.wave = 1;
+    hero.bullet_throw_count = 0;
+    hero.Hero_Direction = 0;
 
     for(auto &i : enemy_baseball)
     {
@@ -2245,7 +2388,7 @@ void iDraw()
                     }
                     enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
                     enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                    enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero(true);
+                    enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
                     if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
                     {
                         Enemy_Baseball::index++;
@@ -2268,7 +2411,7 @@ void iDraw()
                     {
                         enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero(true);
+                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
                         if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
                         {
                             Enemy_Baseball::index++;
@@ -2310,7 +2453,7 @@ void iDraw()
                     {
                         enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero(true);
+                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
 
                         enemy_awk[Enemy_AWK::index].Enemy_Life_Bar();
                         enemy_awk[Enemy_AWK::index].Enemy_Attack();
@@ -2404,7 +2547,7 @@ void iDraw()
                         {
                             enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
                             enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                            enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero(true);
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
                         }
 
                         if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0 && Enemy_Baseball::index < 2)
@@ -2942,6 +3085,10 @@ void iKeyboard(unsigned char key)
         if (key == 'C' || key == 'c')
         {
             games.is_crouch = true;
+        }
+        if (key == 'R' || key == 'r')
+        {
+            hero.bullet_throw_count = 0;
         }
 
         if (key == '1')
