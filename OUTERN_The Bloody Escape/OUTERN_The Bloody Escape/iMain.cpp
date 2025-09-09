@@ -2287,7 +2287,7 @@ void iDraw()
         if(intro.text_blackmask_X >= 1700)
         {
             iPauseTimer(intro.blackmask_Move_Animation);
-            games.Page = 3;
+            games.Page = 1;
             Loading_Sound_Texture();
             menu.Menu_Textures_Load = iSetTimer(300, Load_Menu_Textures);
             mciSendString("play bgsong repeat", NULL, 0, NULL);
@@ -2697,7 +2697,7 @@ void iDraw()
                         boss_dr.Boss_Attacked_By_Hero();
                     }
 
-                    if(Enemy_AWS::index == 8 && boss_dr.boss_health <= 0 && enemy_fat[4].enemy_health <= 0 && enemy_fat[5].enemy_health <= 0)
+                    if(boss_dr.boss_health <= 0 && enemy_fat[4].enemy_health <= 0 && enemy_fat[5].enemy_health <= 0)
                     {
                         games.Level = 0;
                         games.wave = 1;
