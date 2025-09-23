@@ -63,16 +63,23 @@ Open the project in Visual Studio 2013
 3. MD. Tanvir Islam
 
 
-## Screenshots
+
+
 
 ### **Menu**
-<img src="https://github.com/user-attachments/assets/812b978b-b4f9-4cc2-8116-067f85e943bd" width="200" height="200">
+<img width="1520" height="855" alt="OUTERN _ The Bloody Escape 9_24_2025 3_45_48 AM" src="https://github.com/user-attachments/assets/016d4ea7-1e21-40ec-a1c8-6dad97586a0a" />
 
-### **Character**
-<img src="https://github.com/user-attachments/assets/5c8a5fbb-6ebf-48cd-bff0-8235e79d9773" width="200" height="200">
+
+
+<img width="1520" height="855" alt="OUTERN _ The Bloody Escape 9_24_2025 3_46_39 AM" src="https://github.com/user-attachments/assets/cc5dbe31-c827-480c-ac5f-4b81c03ec8ce" />
+
+
+### **Gameplay**
+
+<img width="1520" height="855" alt="OUTERN _ The Bloody Escape 9_24_2025 3_59_51 AM" src="https://github.com/user-attachments/assets/c7462e7e-ac7f-4efb-819a-6ee8f48ab742" />
 
 ## Youtube Link
-[CSE 1200 Project: The Fallen Kingdom](https://www.youtube.com/)
+https://youtu.be/piHAtgK1kCw
 
 ## Project Report
-[Project Report: The Fallen Kingdom](https://drive.google.com/drive/u/1/my-drive)
+https://docs.google.com/document/d/19VgMHhBzWa7z98QpDK7HNF-sP4tROWqA/edit?usp=sharing&ouid=101032083967403889551&rtpof=true&sd=true
