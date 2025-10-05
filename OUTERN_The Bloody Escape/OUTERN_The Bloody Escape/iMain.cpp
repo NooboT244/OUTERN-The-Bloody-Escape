@@ -1,10 +1,11 @@
 #include "iGraphics.h"
+#include <iostream>
 #include<vector>
 #include <algorithm>
 #include <cstdio>
 
-const double Default_window_width = 1520;
-const double Default_window_height = 855;
+double Default_window_width = 1520;
+double Default_window_height = 855;
 
 
 using namespace std;
@@ -15,6 +16,7 @@ struct Intro
     int blinking_Cursour_Color[3], color_Increment_Decrement,blinking_Cursour_Show;
     int intro_background_texture[3],blackmask_Move_Animation;
     double text_blackmask_X;
+    int story_intro[603],load_story_Index = 0,story_Index = 0,story;
 
     Intro()
     {
@@ -54,6 +56,25 @@ struct Intro
         intro_background_texture[1] = iLoadImage("resources\\game_texture\\intro_text_tex\\TEXT_RED.png");
         intro_background_texture[2] = iLoadImage("resources\\game_texture\\intro_text_tex\\Blood.png");
     }
+    void Load_Story_Intro()
+    {
+        if(load_story_Index < 603)
+        {
+            char path[120];
+            sprintf_s(path, "resources\\game_texture\\story_intro\\intro (%d).png", load_story_Index + 1);
+            story_intro[load_story_Index] = iLoadImage(path);
+        }
+        load_story_Index++;
+    }
+    void Show_story()
+    {
+        if(story_Index < 603)
+        {
+            iShowImage(0,0,1520,855,story_intro[story_Index]);
+            story_Index++;
+        }
+        iDelayMS(16);
+    }
 };
 
 struct Waiting
@@ -87,7 +108,7 @@ struct Menu
     int Menu_background_texture[64],Menu_background_texture_index,Menu_Button[5],Menu_Button_Dark[5];
     int Menu_Buttons[10];
     int menu_Texture_Load_index;
-    int Menu_Textures_Load,Menu_Title;
+    int Menu_Title;
     int Play_Index,Credits_Index,Help_Index,Sound_Index,Exit_Index;
     int SOUND_ICON_Texture[2],SOUND_ICON_Index;
 
@@ -115,7 +136,6 @@ struct Menu
             Menu_background_texture[menu_Texture_Load_index] = iLoadImage(textures_name);
         }
         menu_Texture_Load_index++;
-
     }
     void Load_Menu_Buttons()
     {
@@ -757,9 +777,15 @@ struct Hero
         {
 
         case 2:
-            if(!hero_attack_2_index)
+
+            switch(hero_attack_2_index)
             {
+            case 3:
                 mciSendString("play Chainsaw_Sound from 2", NULL, 0, NULL);
+                break;
+            case 15:
+                mciSendString("play Chainsaw_Sound from 2", NULL, 0, NULL);
+                break;
             }
 
             if (hero_attack_2_index < 25)
@@ -777,12 +803,12 @@ struct Hero
                 {
                     hero_attack_2_index = 0;
                     is_attack = false;
+                    mciSendString("stop Chainsaw_Sound", NULL, 0, NULL);
                 }
             }
             else
             {
                 hero_attack_2_index = 2;
-                mciSendString("play Chainsaw_Sound from 2", NULL, 0, NULL);
             }
 
 
@@ -797,6 +823,16 @@ struct Hero
 
             if(bullet_throw_count < 40)
             {
+                switch(hero_attack_3_index)
+                {
+                case 9:
+                    mciSendString("play shoot_Sound from 0", NULL, 0, NULL);
+                    break;
+                case 18:
+                    mciSendString("play shoot_Sound from 0", NULL, 0, NULL);
+                    break;
+                }
+
                 games.A_D_press = false;
                 if (hero_attack_3_index < 27)
                 {
@@ -810,6 +846,7 @@ struct Hero
                 {
                     hero_attack_3_index = 0;
                     is_attack = false;
+                    mciSendString("stop shoot_Sound", NULL, 0, NULL);
                 }
                 if (hero_attack_3_index >= 27)
                 {
@@ -824,6 +861,22 @@ struct Hero
             }
             break;
         default:
+            switch(hero_attack_1_index)
+            {
+            case 3:
+                mciSendString("play knife_Sound from 0", NULL, 0, NULL);
+                break;
+            case 9:
+                mciSendString("play knife_Sound from 0", NULL, 0, NULL);
+                break;
+            case 15:
+                mciSendString("play knife_Sound from 0", NULL, 0, NULL);
+                break;
+            case 21:
+                mciSendString("play knife_Sound from 0", NULL, 0, NULL);
+                break;
+            }
+
             if (hero_attack_1_index < 25)
             {
                 hero_attack_1_index++;
@@ -833,6 +886,7 @@ struct Hero
             {
                 hero_attack_1_index = 0;
                 is_attack = false;
+                mciSendString("stop knife_Sound", NULL, 0, NULL);
             }
 
             if (hero_attack_1_index >= 25)
@@ -864,6 +918,11 @@ void Load_Intro_Textures()
 {
     intro.Load_Intro_Textures();
 }
+void Show_story()
+{
+    intro.Show_story();
+}
+
 
 Waiting waiting;
 void Load_waiting_page_texture()
@@ -1092,6 +1151,8 @@ struct Enemy_Baseball
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1099,6 +1160,8 @@ struct Enemy_Baseball
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1107,13 +1170,15 @@ struct Enemy_Baseball
 
         for(int i = 0; i < hero.bullet_throw_count; i++)
         {
-            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= (enemy_Position_X + 103) && (hero.BulletPositionX[i] + 40) <= (enemy_Position_X + 195))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
             }
-            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= (enemy_Position_X + 103) && hero.BulletPositionX[i] <= (enemy_Position_X + 195))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
             }
@@ -1263,6 +1328,8 @@ struct Enemy_AWK
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1270,6 +1337,8 @@ struct Enemy_AWK
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1277,6 +1346,8 @@ struct Enemy_AWK
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1285,13 +1356,15 @@ struct Enemy_AWK
 
         for(int i = 0; i < hero.bullet_throw_count; i++)
         {
-            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= (enemy_Position_X + 70) && (hero.BulletPositionX[i] + 40) <= (enemy_Position_X + 253))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
             }
-            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= (enemy_Position_X + 70) && hero.BulletPositionX[i] <= (enemy_Position_X + 253))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
             }
@@ -1445,6 +1518,8 @@ struct Enemy_AWS
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1452,6 +1527,8 @@ struct Enemy_AWS
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1459,6 +1536,8 @@ struct Enemy_AWS
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1467,17 +1546,17 @@ struct Enemy_AWS
 
         for(int i = 0; i < hero.bullet_throw_count; i++)
         {
-            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= (enemy_Position_X + 123) && (hero.BulletPositionX[i] + 40) <= (enemy_Position_X + 253))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
-
             }
-            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= (enemy_Position_X + 123) && hero.BulletPositionX[i] <= (enemy_Position_X + 253))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
-
             }
         }
     }
@@ -1621,6 +1700,8 @@ struct Enemy_Fat
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1628,6 +1709,8 @@ struct Enemy_Fat
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1635,6 +1718,8 @@ struct Enemy_Fat
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         enemy_health -= 5;
                     }
                 }
@@ -1643,18 +1728,17 @@ struct Enemy_Fat
 
         for(int i = 0; i < hero.bullet_throw_count; i++)
         {
-            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= enemy_Position_X && (hero.BulletPositionX[i] + 40) <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= (enemy_Position_X + 123) && (hero.BulletPositionX[i] + 40) <= (enemy_Position_X + 253))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
-                enemy_Position_X += 150;
-
             }
-            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= enemy_Position_X && hero.BulletPositionX[i] <= enemy_Position_X + 160)
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= (enemy_Position_X + 123) && hero.BulletPositionX[i] <= (enemy_Position_X + 253))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 enemy_health -= 10;
-                enemy_Position_X -= 150;
             }
         }
     }
@@ -1778,6 +1862,8 @@ struct Boss_Razor
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 5;
                     }
                 }
@@ -1785,6 +1871,8 @@ struct Boss_Razor
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 5;
                     }
                 }
@@ -1792,6 +1880,8 @@ struct Boss_Razor
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 5;
                     }
                 }
@@ -1800,14 +1890,15 @@ struct Boss_Razor
 
         for(int i = 0; i < hero.bullet_throw_count; i++)
         {
-            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= boss_Position_X && (hero.BulletPositionX[i] + 40) <= boss_Position_X + 160)
+            if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= (boss_Position_X + 259) && (hero.BulletPositionX[i] + 40) <= (boss_Position_X + 385))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 boss_health -= 10;
-
             }
-            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= boss_Position_X && hero.BulletPositionX[i] <= boss_Position_X + 160)
+            if(hero.bullet_status[i] && hero.BulletPositionX[i] >= (boss_Position_X + 249) && hero.BulletPositionX[i] <= (boss_Position_X + 385))
             {
+                mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                 hero.bullet_status[i] = 0;
                 boss_health -= 10;
             }
@@ -1941,6 +2032,8 @@ struct Boss_DR
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 5;
                     }
                 }
@@ -1948,6 +2041,8 @@ struct Boss_DR
                 {
                     if (hero.hero_attack_1_index == 5 || hero.hero_attack_1_index == 10 || hero.hero_attack_1_index == 17 || hero.hero_attack_1_index == 22)
                     {
+                        mciSendString("stop knife_Sound", NULL, 0, NULL);
+                        mciSendString("play knife_Hit_Sound from 0", NULL, 0, NULL);
                         boss_health -= 5;
                     }
                 }
@@ -1955,14 +2050,15 @@ struct Boss_DR
 
             for(int i = 0; i < hero.bullet_throw_count; i++)
             {
-                if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= boss_Position_X && (hero.BulletPositionX[i] + 40) <= boss_Position_X + 160)
+                if(hero.bullet_status[i] && (hero.BulletPositionX[i] + 40) >= (boss_Position_X + 61) && (hero.BulletPositionX[i] + 40) <= (boss_Position_X + 153))
                 {
+                    mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                     hero.bullet_status[i] = 0;
                     boss_health -= 10;
-
                 }
-                if(hero.bullet_status[i] && hero.BulletPositionX[i] >= boss_Position_X && hero.BulletPositionX[i] <= boss_Position_X + 160)
+                if(hero.bullet_status[i] && hero.BulletPositionX[i] >= (boss_Position_X + 61) && hero.BulletPositionX[i] <= (boss_Position_X + 153))
                 {
+                    mciSendString("play bullet_hit_Sound from 0", NULL, 0, NULL);
                     hero.bullet_status[i] = 0;
                     boss_health -= 10;
                 }
@@ -2104,7 +2200,6 @@ struct Boss_DR
             }
         }
     }
-
 };
 Boss_DR boss_dr;
 
@@ -2150,7 +2245,7 @@ struct User
         {
             currentPlayer.name[0] = '\0';
 
-            while(fscanf_s(file,"%s %ld",currentPlayer.name,&currentPlayer.time) != EOF)
+			while (fscanf_s(file, "%49s %ld", currentPlayer.name, sizeof(currentPlayer.name), &currentPlayer.time) == 2)
             {
                 playersList.push_back(currentPlayer);
             }
@@ -2275,7 +2370,6 @@ void iDraw()
             iPauseTimer(intro.blackmask_Move_Animation);
             games.Page = 1;
             Loading_Sound_Texture();
-            menu.Menu_Textures_Load = iSetTimer(300, Load_Menu_Textures);
             mciSendString("play bgsong repeat", NULL, 0, NULL);
         }
     }
@@ -2283,16 +2377,17 @@ void iDraw()
     {
         iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
         iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[1]);
-        if(menu.menu_Texture_Load_index <= 66)
+        if(intro.load_story_Index <= 605)
         {
             iSetColor(255,255,255);
             iRectangle(200,100,1120,30);
             games.Loading_Level_Icons();
-            iFilledRectangle(205,105,(((menu.menu_Texture_Load_index < 64)? menu.menu_Texture_Load_index:63)*1110)/63,20);
+            menu.Load_Menu_Textures();
+            intro.Load_Story_Intro();
+            iFilledRectangle(205,105,(((intro.load_story_Index < 603)? intro.load_story_Index:602)*1110)/602,20);
         }
         else
         {
-            iPauseTimer(menu.Menu_Textures_Load);
             iShowImage((Default_window_width/2) - 150,300,300,101, waiting.Waiting_Page_Textures[waiting.Tap_To_Continue_Index]);
         }
 
@@ -2318,10 +2413,7 @@ void iDraw()
     }
     else if(games.Page == 3)
     {
-
-        iDelayMS(60);
         //Level
-
         if(games.Level == 0)
         {
             ss.Load_Score_Title();
@@ -2343,6 +2435,7 @@ void iDraw()
         {
             if(enemy.enemy_texture_load_index < 68)
             {
+                mciSendString("stop Select_Sound", NULL, 0, NULL);
                 glLineWidth(1);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[1]);
@@ -2355,60 +2448,47 @@ void iDraw()
             }
             else
             {
-                if(hero.hero_health <= 0)
+                if(intro.story_Index >= 603)
                 {
-                    games.Level = 4;
-                }
-                iShowImage(0,0,1520,855,games.bg_image_1);
-                glLineWidth(1);
-                iShowImage(0,695,150,150,hero.hero_head);
-                iResumeTimer(hero.Hero_Animation_Standing);
-                iSetColor(255,255,255);
-                iRectangle(135,765,202,25);
-                if(games.key == 3)
-                {
-                    iShowImage(135,720,15,30,hero.Bullet[2]);
-                    char bulletCount[5];
-                    sprintf_s(bulletCount,"%d",(40 - hero.bullet_throw_count));
-                    iText(154,725,bulletCount,GLUT_BITMAP_TIMES_ROMAN_24);
-                }
-                iSetColor(144,42,18);
-                iFilledRectangle(136,766,hero.hero_health,23);
+                    iDelayMS(60);
+                    if(intro.story_Index == 603)
+                    {
+                        mciSendString("stop sbgm", NULL, 0, NULL);
+                        mciSendString("play bgsong repeat", NULL, 0, NULL);
+                        intro.story_Index++;
+                    }
+					
+                    if(hero.hero_health <= 0)
+                    {
+                        games.Level = 4;
+                    }
+                    iShowImage(0,0,1520,855,games.bg_image_1);
+                    glLineWidth(1);
+                    iShowImage(0,695,150,150,hero.hero_head);
+                    iResumeTimer(hero.Hero_Animation_Standing);
+                    iSetColor(255,255,255);
+                    iRectangle(135,765,202,25);
+                    if(games.key == 3)
+                    {
+                        iShowImage(135,720,15,30,hero.Bullet[2]);
+                        char bulletCount[5];
+                        sprintf_s(bulletCount,"%d",(40 - hero.bullet_throw_count));
+                        iText(154,725,bulletCount,GLUT_BITMAP_TIMES_ROMAN_24);
+                    }
+                    iSetColor(144,42,18);
+                    iFilledRectangle(136,766,hero.hero_health,23);
 
-                hero.Hero_Attack();
-                hero.Hero_Moves();
+                    hero.Hero_Attack();
+                    hero.Hero_Moves();
 
-                if(games.wave == 1)
-                {
-                    ss.start_time = time(NULL);
-                    if(games.wave_texture_timer_index < 20)
+                    if(games.wave == 1)
                     {
-                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[0]);
-                        games.wave_texture_timer_index++;
-                    }
-                    enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
-                    enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                    enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
-                    if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
-                    {
-                        Enemy_Baseball::index++;
-                    }
-
-                    if(Enemy_Baseball::index == 3)
-                    {
-                        games.wave = 2;
-                        games.wave_texture_timer_index = 0;
-                    }
-                }
-                else if(games.wave == 2)
-                {
-                    if(games.wave_texture_timer_index < 20)
-                    {
-                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[1]);
-                        games.wave_texture_timer_index++;
-                    }
-                    if(Enemy_AWK::index%2 == Enemy_Baseball::index%2)
-                    {
+                        ss.start_time = time(NULL);
+                        if(games.wave_texture_timer_index < 20)
+                        {
+                            iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[0]);
+                            games.wave_texture_timer_index++;
+                        }
                         enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
                         enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
@@ -2416,73 +2496,103 @@ void iDraw()
                         {
                             Enemy_Baseball::index++;
                         }
+
+                        if(Enemy_Baseball::index == 3)
+                        {
+                            games.wave = 2;
+                            games.wave_texture_timer_index = 0;
+                        }
+                    }
+                    else if(games.wave == 2)
+                    {
+                        if(games.wave_texture_timer_index < 20)
+                        {
+                            iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[1]);
+                            games.wave_texture_timer_index++;
+                        }
+                        if(Enemy_AWK::index%2 == Enemy_Baseball::index%2)
+                        {
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
+                            if(enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
+                            {
+                                Enemy_Baseball::index++;
+                            }
+                        }
+                        else
+                        {
+                            enemy_awk[Enemy_AWK::index].Enemy_Life_Bar();
+                            enemy_awk[Enemy_AWK::index].Enemy_Attack();
+                            enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
+                            if(enemy_awk[Enemy_AWK::index].enemy_health <= 0)
+                            {
+                                Enemy_AWK::index++;
+                            }
+                        }
+                        if(Enemy_AWK::index == 3)
+                        {
+                            games.wave = 3;
+                            games.wave_texture_timer_index = 0;
+                        }
                     }
                     else
                     {
-                        enemy_awk[Enemy_AWK::index].Enemy_Life_Bar();
-                        enemy_awk[Enemy_AWK::index].Enemy_Attack();
-                        enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
-                        if(enemy_awk[Enemy_AWK::index].enemy_health <= 0)
+                        if(games.wave_texture_timer_index < 20)
                         {
-                            Enemy_AWK::index++;
+                            iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[2]);
+                            if(!games.wave_texture_timer_index++)
+                            {
+                                razor.boss_approach_index = 0;
+                                razor.boss_attack_index = 0;
+                                razor.boss_Position_X = 1600;
+                                enemy_baseball[6].enemy_Position_X = -80;
+                                enemy_awk[3].enemy_Position_X = -80;
+                                enemy_awk[5].enemy_Position_X = -80;
+                            }
                         }
-                    }
-                    if(Enemy_AWK::index == 3)
-                    {
-                        games.wave = 3;
-                        games.wave_texture_timer_index = 0;
+                        if(Enemy_Baseball::index < 8 || Enemy_AWK::index < 6)
+                        {
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
+                            enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
+
+                            enemy_awk[Enemy_AWK::index].Enemy_Life_Bar();
+                            enemy_awk[Enemy_AWK::index].Enemy_Attack();
+                            enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
+                            if (enemy_awk[Enemy_AWK::index].enemy_health <= 0 && enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
+                            {
+                                Enemy_AWK::index++;
+                                Enemy_Baseball::index++;
+                            }
+                        }
+                        else
+                        {
+                            iShowImage(1350,705,150,150,enemy.boss_Icons[0]);
+                            iSetColor(255,255,255);
+                            iRectangle(1150,765,202,25);
+                            iSetColor(164,198,57);
+                            iFilledRectangle(1151,766,razor.boss_health,23);
+                            razor.Boss_Attack();
+                            razor.Boss_Attacked_By_Hero();
+                            if(razor.boss_health <= 0)
+                            {
+                                iShowImage(0,0,1520,855,waiting.Level_Waiting_Textures[0]);
+                                if(games.key == '\r')
+                                {
+                                    games.Level = 2;
+                                    games.wave = 1;
+                                    game_initialize();
+                                }
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    if(games.wave_texture_timer_index < 20)
-                    {
-                        iShowImage(0,0,Default_window_width,Default_window_height,games.wave_textures[2]);
-                        if(!games.wave_texture_timer_index++)
-                        {
-                            razor.boss_approach_index = 0;
-                            razor.boss_attack_index = 0;
-                            razor.boss_Position_X = 1600;
-                            enemy_baseball[6].enemy_Position_X = -80;
-                            enemy_awk[3].enemy_Position_X = -80;
-                            enemy_awk[5].enemy_Position_X = -80;
-                        }
-                    }
-                    if(Enemy_Baseball::index < 8 || Enemy_AWK::index < 6)
-                    {
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Life_Bar();
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Attack();
-                        enemy_baseball[Enemy_Baseball::index].Enemy_Attacked_By_Hero();
-
-                        enemy_awk[Enemy_AWK::index].Enemy_Life_Bar();
-                        enemy_awk[Enemy_AWK::index].Enemy_Attack();
-                        enemy_awk[Enemy_AWK::index].Enemy_Attacked_By_Hero();
-                        if (enemy_awk[Enemy_AWK::index].enemy_health <= 0 && enemy_baseball[Enemy_Baseball::index].enemy_health <= 0)
-                        {
-                            Enemy_AWK::index++;
-                            Enemy_Baseball::index++;
-                        }
-                    }
-                    else
-                    {
-                        iShowImage(1350,705,150,150,enemy.boss_Icons[0]);
-                        iSetColor(255,255,255);
-                        iRectangle(1150,765,202,25);
-                        iSetColor(164,198,57);
-                        iFilledRectangle(1151,766,razor.boss_health,23);
-                        razor.Boss_Attack();
-                        razor.Boss_Attacked_By_Hero();
-                        if(razor.boss_health <= 0)
-                        {
-                            iShowImage(0,0,1520,855,waiting.Level_Waiting_Textures[0]);
-                            if(games.key == '\r')
-                            {
-                                games.Level = 2;
-                                games.wave = 1;
-                                game_initialize();
-                            }
-                        }
-                    }
+                    mciSendString("stop bgsong", NULL, 0, NULL);
+                    mciSendString("play sbgm", NULL, 0, NULL);
+                    intro.Show_story();
                 }
             }
         }
@@ -2491,6 +2601,7 @@ void iDraw()
 
             if(enemy.enemy_texture_load_index < 68)
             {
+                mciSendString("stop Select_Sound", NULL, 0, NULL);
                 glLineWidth(1);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[0]);
                 iShowImage(0, 0, Default_window_width, Default_window_height, waiting.Waiting_Page_Textures[1]);
@@ -2504,6 +2615,7 @@ void iDraw()
             }
             else
             {
+                iDelayMS(60);
                 if(hero.hero_health <= 0)
                 {
                     games.Level = 4;
@@ -3091,11 +3203,14 @@ void iMouse(int button, int state, int mx, int my)
     {
         if(mx >= 155 && mx <= 455 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             games.Level = 1;
+            intro.story_Index = 0;
             game_initialize_new_start();
         }
         else if(mx >= 610 && mx <= 910 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             games.Level = 2;
             game_initialize_new_start();
         }
@@ -3129,10 +3244,12 @@ void iMouse(int button, int state, int mx, int my)
     {
         if(mx >= 410 && mx <= 610 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             exit(0);
         }
         else if(mx >= 910 && mx <= 1110 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
+            mciSendString("play Select_Sound from 0", NULL, 0, NULL);
             games.exit_press = false;
         }
     }
@@ -3169,7 +3286,7 @@ void iMouse(int button, int state, int mx, int my)
             else
             {
                 menu.SOUND_ICON_Index = 0;
-                mciSendString("play bgsong repeat", NULL, 0, NULL);
+                mciSendString("play bgsong from 0 repeat", NULL, 0, NULL);
             }
         }
         else if(my <= 147 && my >= 80 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -3247,6 +3364,7 @@ void iKeyboard(unsigned char key)
             }
             if (key == 'R' || key == 'r')
             {
+                mciSendString("play reload_Sound from 0", NULL, 0, NULL);
                 hero.bullet_throw_count = 0;
             }
 
@@ -3360,10 +3478,18 @@ int main()
     u.readInfo();
     Load_Menu_Buttons();
     mciSendString("open \"resources\\musics\\Main_bg_sound.mp3\" alias bgsong", NULL, 0, NULL);
+
+    mciSendString("open \"resources\\sounds\\story_sound.MP3\" type mpegvideo alias sbgm", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\Intro.mp3\" alias Intro_Sound", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\select_effect.mp3\" alias Select_Sound", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\Effect\\Chain saw\\ATK_ChainsawSwipe1.mp3\" alias Chainsaw_Sound", NULL, 0, NULL);
     mciSendString("open \"resources\\sounds\\Effect\\Chain_saw hit\\sawHit1.mp3\" alias Chainsaw_Hit_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\knife swing\\KnifeImapct.mp3\" alias knife_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\kife hit\\knifeHit2_AB.mp3\" alias knife_Hit_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\Pistol shoot\\ATK_PistolShoot_V3.mp3\" alias shoot_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\Bullet hit\\bulletHit2.mp3\" alias bullet_hit_Sound", NULL, 0, NULL);
+    mciSendString("open \"resources\\sounds\\Effect\\pistol reload\\ATK_PistolReload.mp3\" alias reload_Sound", NULL, 0, NULL);
+
     games.exit_text = iLoadImage("resources\\game_texture\\exit\\exit_text.png");
     games.Back_Button = iLoadImage("resources\\game_texture\\ui_buttons\\Back.png");
     menu.Menu_Title = iLoadImage("resources\\game_texture\\menu_textures\\title.png");
